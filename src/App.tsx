@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useReducer, useEffect, useMemo } from 'react';
 import './App.css';
 
 import { Button, TextInput, Form } from '@patternfly/react-core';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 
-function App() {
+export default function App() {
 
   const cells = [
     { title: 'Lap #' },
@@ -17,10 +17,59 @@ function App() {
     { cells: [ '3', '123:12' ] },
   ];
 
-  const onStart = () => console.warn('onStart');
-  const onStop = () => console.warn('onStop');
-  const onPause = () => console.warn('onPause');
-  const onResume = () => console.warn('onResume');
+  const [state, dispatch] = useReducer((prevState: any, action: any) => {
+    console.log('reduce', {
+      action,
+      prevState,
+    })
+    switch (action.type) {
+      case 'START':
+        return { started: true };
+      case 'STOP':
+        return { started: false };
+      case 'PAUSE':
+        return { started: false };
+      case 'RESUME':
+        return { started: true };
+      case 'SPACE_PRESSED':
+        return { started: true };
+      case 'BACKSPACE_PRESSED':
+        return { started: true };
+      default:
+        console.warn(`Unknown action type: ${action.type}`, action);
+        return prevState;
+    }
+  }, { started: false });
+
+  const onStart = () => dispatch({ type: 'START' });
+  const onStop = () => dispatch({ type: 'STOP' });
+  const onPause = () => dispatch({ type: 'PAUSE' });
+  const onResume = () => dispatch({ type: 'RESUME' });
+
+  const currentTime = Date.now();
+
+  const onKeyPress = useMemo(() => (e: KeyboardEvent) => {
+    if (e.code === 'Space') {
+      dispatch({ type: 'SPACE_PRESSED' });
+    }
+  }, []);
+
+  const onKeyUp = useMemo(() => (e: KeyboardEvent) => {
+    if (e.code === 'Backspace') {
+      dispatch({ type: 'BACKSPACE_PRESSED' });
+    }
+  }, []);
+
+  useEffect(() => {
+    console.warn('mount');
+    document.addEventListener('keypress', onKeyPress);
+    document.addEventListener('keyup', onKeyUp);
+    return () => {
+      console.warn('unmount');
+      document.removeEventListener('keypress', onKeyPress);
+      document.removeEventListener('keyup', onKeyUp);
+    };
+  });
 
   return (
     <div>
@@ -32,6 +81,14 @@ function App() {
           css=""
           onChange={() => console.warn('x')}
         />
+
+        <div>
+          Last rendered
+          {currentTime}
+        </div>
+        <div>
+          {JSON.stringify(state)}
+        </div>
 
         <Button variant="primary" onClick={onStart}>Start</Button>
         <Button variant="primary" onClick={onStop}>Stop</Button>
@@ -47,5 +104,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
