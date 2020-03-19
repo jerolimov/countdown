@@ -1,8 +1,10 @@
 import React, { useReducer, useEffect, useMemo } from 'react';
 import './App.css';
 
-import { Button, TextInput, Form } from '@patternfly/react-core';
+import { Button, Form } from '@patternfly/react-core';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
+
+import TimeInput from './TimeInput';
 
 export default function App() {
 
@@ -75,11 +77,9 @@ export default function App() {
     <div>
 
       <Form>
-        <TextInput
-          aria-label="Time input"
-          type="time"
-          css=""
-          onChange={() => console.warn('x')}
+
+        <TimeInput
+          onChange={(time) => console.log('TimeInput onChange', time)}
         />
 
         <div>
