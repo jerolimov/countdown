@@ -6,30 +6,30 @@ export interface CounterState {
 }
 
 export type CounterAction =
-  | { type: 'START_PRESSED' }
-  | { type: 'STOP_PRESSED' }
-  | { type: 'PAUSE_PRESSED' }
-  | { type: 'RESUME_PRESSED' }
-  | { type: 'SPACE_PRESSED' }
-  | { type: 'BACKSPACE_PRESSED' }
+  | { type: 'START' }
+  | { type: 'STOP' }
+  | { type: 'PAUSE' }
+  | { type: 'RESUME' }
+  | { type: 'NEW_LAP' }
+  | { type: 'UNDO_NEW_LAP' }
 
 export const reducer = (prevState: CounterState, action: CounterAction): CounterState => {
   switch (action.type) {
-    case 'START_PRESSED':
+    case 'START':
       return { ...prevState, isStarted: true, isPaused: false };
-    case 'STOP_PRESSED':
+    case 'STOP':
       return { ...prevState, isStarted: false };
-    case 'PAUSE_PRESSED':
+    case 'PAUSE':
       return { ...prevState, isStarted: true, isPaused: true };
-    case 'RESUME_PRESSED':
+    case 'RESUME':
       return { ...prevState, isStarted: true, isPaused: false };
-    case 'SPACE_PRESSED':
+    case 'NEW_LAP':
       const duration = 3;
       return {
         ...prevState,
         laps: [ { duration }, ...prevState.laps ]
       };
-    case 'BACKSPACE_PRESSED':
+    case 'UNDO_NEW_LAP':
       return { ...prevState, isStarted: true };
       default:
       console.warn('Unknown action:', action);

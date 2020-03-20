@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect, useMemo, useState } from 'react';
 import './App.css';
 
-import { Button, Form, Flex, FlexItem, FlexModifiers, Alert, AlertProps, AlertGroup, AlertActionCloseButton } from '@patternfly/react-core';
+import { Button, Flex, FlexModifiers, Alert, AlertProps, AlertGroup, AlertActionCloseButton } from '@patternfly/react-core';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 
 import TimeInput from './TimeInput';
@@ -69,19 +69,19 @@ export default function App() {
   const onKeyPress = useMemo(() => (e: KeyboardEvent) => {
     if (e.code === 'Space') {
       if (e.shiftKey) {
-        dispatch({ type: 'BACKSPACE_PRESSED' });
-        addAlert({ variant: 'success', title: 'Backspace pressed' });
+        dispatch({ type: 'UNDO_NEW_LAP' });
+        addAlert({ variant: 'success', title: 'Undo new lap!' });
       } else {
-        dispatch({ type: 'SPACE_PRESSED' });
-        addAlert({ variant: 'success', title: 'Space pressed' });  
+        dispatch({ type: 'NEW_LAP' });
+        addAlert({ variant: 'success', title: 'New lap!' });  
       }
     }
   }, []);
   
   const onKeyUp = useMemo(() => (e: KeyboardEvent) => {
     if (e.code === 'Backspace') {
-      dispatch({ type: 'BACKSPACE_PRESSED' });
-      addAlert({ variant: 'success', title: 'Backspace pressed' });
+      dispatch({ type: 'UNDO_NEW_LAP' });
+      addAlert({ variant: 'success', title: 'Undo new lap!' });
     } else if (e.code === 'Space') {
       document.body.style.overflow = 'auto';
     }
