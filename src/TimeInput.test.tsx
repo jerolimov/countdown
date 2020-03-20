@@ -5,8 +5,14 @@ import TimeInput, { Time } from './TimeInput';
 
 describe('TimeInput', () => {
 
-  const getInputElementByLabelText = (matcher: Matcher) =>
-    screen.getByLabelText(matcher).parentElement!.lastElementChild!;
+  // Helper
+  const getInputElementByLabelText = (matcher: Matcher) => {
+    const label = screen.getByLabelText(matcher);
+    expect(label).toBeTruthy();
+    expect(label.parentElement).toBeTruthy();
+    expect(label.parentElement!.lastElementChild).toBeTruthy();
+    return label.parentElement!.lastElementChild!;
+  }
 
   it('should render four labeled input fields', () => {
     render(<TimeInput />);
