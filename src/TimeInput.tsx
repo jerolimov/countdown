@@ -45,7 +45,6 @@ export default function TimeInput({ value, onChange }: TimeInputProps) {
   const onChangeField = (value: string, event: React.FormEvent<HTMLInputElement>) => {
     const slot = event.currentTarget.getAttribute('data-slot');
     const val = parseInt(value);
-    console.warn('onChange', slot, value);
     if (!slot || isNaN(val)) {
       return;
     }

@@ -1,11 +1,13 @@
 import React from 'react';
-import { render, getByDisplayValue, fireEvent, screen, Matcher } from '@testing-library/react';
+import { render, fireEvent, screen, Matcher } from '@testing-library/react';
 
 import TimeInput, { Time } from './TimeInput';
 
 describe('TimeInput', () => {
 
+  //
   // Helper
+  //
   const getInputElementByLabelText = (matcher: Matcher) => {
     const label = screen.getByLabelText(matcher);
     expect(label).toBeTruthy();
@@ -14,6 +16,20 @@ describe('TimeInput', () => {
     return label.parentElement!.lastElementChild!;
   }
 
+  const getInputElementValueByLabelText = (matcher: Matcher) => {
+    return getInputElementByLabelText(matcher).getAttribute('value')
+  }
+
+  const assertTimeOutput = (time: Time) => {
+    expect(getInputElementValueByLabelText(/day/i)).toBe(time.days.toString());
+    expect(getInputElementValueByLabelText(/hour/i)).toBe(time.hours.toString());
+    expect(getInputElementValueByLabelText(/minute/i)).toBe(time.minutes.toString());
+    expect(getInputElementValueByLabelText(/second/i)).toBe(time.seconds.toString());
+  }
+
+  //
+  // Output tests
+  //
   it('should render four labeled input fields', () => {
     render(<TimeInput />);
 
@@ -43,34 +59,12 @@ describe('TimeInput', () => {
     screen.getByLabelText(/minute/i);
     screen.getByLabelText(/second/i);
 
-    // Assert time output
-    screen.getByDisplayValue('1');
-    screen.getByDisplayValue('2');
-    screen.getByDisplayValue('3');
-    screen.getByDisplayValue('4');
-
     // Assert that the right input fields are filled.
-    getByDisplayValue(screen.getByLabelText(/day/i).parentElement!, '1');
-    getByDisplayValue(screen.getByLabelText(/hour/i).parentElement!, '2');
-    getByDisplayValue(screen.getByLabelText(/minute/i).parentElement!, '3');
-    getByDisplayValue(screen.getByLabelText(/second/i).parentElement!, '4');
-
-    // Alternative without parentElement!
-    expect(getInputElementByLabelText(/day/i)?.getAttribute('value')).toBe('1');
-    expect(getInputElementByLabelText(/hour/i)?.getAttribute('value')).toBe('2');
-    expect(getInputElementByLabelText(/minute/i)?.getAttribute('value')).toBe('3');
-    expect(getInputElementByLabelText(/second/i)?.getAttribute('value')).toBe('4');
+    assertTimeOutput(time);
 
     // Assert that onChange was not called
     expect(onChange).not.toHaveBeenCalled()
   });
-
-  const assertTimeOutput = (time: Time) => {
-    expect(getInputElementByLabelText(/day/i)?.getAttribute('value')).toBe(time.days.toString());
-    expect(getInputElementByLabelText(/hour/i)?.getAttribute('value')).toBe(time.hours.toString());
-    expect(getInputElementByLabelText(/minute/i)?.getAttribute('value')).toBe(time.minutes.toString());
-    expect(getInputElementByLabelText(/second/i)?.getAttribute('value')).toBe(time.seconds.toString());
-  }
 
   it('should updates correctly if the value prop changes', () => {
     // First render
@@ -98,6 +92,9 @@ describe('TimeInput', () => {
     expect(onChange).not.toHaveBeenCalled()
   });
 
+  //
+  // User input tests
+  //
   it('should call onChange for each field change', () => {
     // First render
     const time: Time = {
@@ -109,10 +106,10 @@ describe('TimeInput', () => {
     const onChange = jest.fn();
     render(<TimeInput value={time} onChange={onChange} />);
 
-    const daysInput = getInputElementByLabelText(/day/i)!;
-    const hoursInput = getInputElementByLabelText(/hour/i)!;
-    const minutesInput = getInputElementByLabelText(/minute/i)!;
-    const secondsInput = getInputElementByLabelText(/second/i)!;
+    const daysInput = getInputElementByLabelText(/day/i);
+    const hoursInput = getInputElementByLabelText(/hour/i);
+    const minutesInput = getInputElementByLabelText(/minute/i);
+    const secondsInput = getInputElementByLabelText(/second/i);
 
     fireEvent.change(daysInput, { target: { value: '11' } });
 
@@ -166,5 +163,36 @@ describe('TimeInput', () => {
         }
       ],
     ]);
+  });
+
+  it('should handle invalid inputs (also if the browser denies this)', () => {
+    // First render
+    const time: Time = {
+      days: 1,
+      hours: 2,
+      minutes: 3,
+      seconds: 4,
+    };
+    const onChange = jest.fn();
+    render(<TimeInput value={time} onChange={onChange} />);
+
+    const daysInput = getInputElementByLabelText(/day/i);
+    const hoursInput = getInputElementByLabelText(/hour/i);
+
+    fireEvent.change(daysInput, { target: { value: 'a' } });
+
+    // Assert that onChange was not called
+    expect(onChange).toBeCalledTimes(0);
+
+    fireEvent.change(hoursInput, { target: { value: '222' } });
+
+    // Assert that onChange was not called
+    expect(onChange).toBeCalledTimes(1);
+    expect(onChange).lastCalledWith({
+      days: 1,
+      hours: 222,
+      minutes: 3,
+      seconds: 4,
+    });
   });
 });
