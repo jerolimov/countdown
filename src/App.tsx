@@ -1,12 +1,38 @@
-import React, { useReducer, useEffect, useMemo } from 'react';
+import React, { useReducer, useEffect, useMemo, useState } from 'react';
 import './App.css';
 
-import { Button, Form } from '@patternfly/react-core';
+import { Button, Form, Flex, FlexItem, FlexModifiers, Alert, AlertProps, AlertGroup, AlertActionCloseButton } from '@patternfly/react-core';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 
 import TimeInput from './TimeInput';
+import Countdown from './Countdown';
+import { reducer, initialState } from './CountdownReducer';
 
 export default function App() {
+
+  const [alerts, setAlerts] = useState<AlertProps[]>([]);
+
+  const addAlert = (alert: AlertProps, timeout = 3000) => {
+    const key = Date.now();
+    setAlerts(alerts => [
+      ...alerts,
+      {
+        ...alert,
+        key,
+        action: (
+          <AlertActionCloseButton onClose={() => removeAlert(key)} />
+        ),
+      }
+    ]);
+    if (timeout > 0) {
+      setTimeout(() => removeAlert(key), timeout);
+    }
+  };
+
+  const removeAlert = (key: string | number) => {
+    console.warn('removeAlert', key, alerts);
+    setAlerts(alerts => alerts.filter(alert => alert.key !== key));
+  }
 
   const cells = [
     { title: 'Lap #' },
@@ -19,46 +45,51 @@ export default function App() {
     { cells: [ '3', '123:12' ] },
   ];
 
-  const [state, dispatch] = useReducer((prevState: any, action: any) => {
-    console.log('reduce', {
-      action,
-      prevState,
-    })
-    switch (action.type) {
-      case 'START':
-        return { started: true };
-      case 'STOP':
-        return { started: false };
-      case 'PAUSE':
-        return { started: false };
-      case 'RESUME':
-        return { started: true };
-      case 'SPACE_PRESSED':
-        return { started: true };
-      case 'BACKSPACE_PRESSED':
-        return { started: true };
-      default:
-        console.warn(`Unknown action type: ${action.type}`, action);
-        return prevState;
-    }
-  }, { started: false });
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const onStart = () => dispatch({ type: 'START' });
-  const onStop = () => dispatch({ type: 'STOP' });
-  const onPause = () => dispatch({ type: 'PAUSE' });
-  const onResume = () => dispatch({ type: 'RESUME' });
+  const onStart = () => {
+    dispatch({ type: 'START' });
+    addAlert({ variant: 'success', title: 'Start pressed' });
+  }
+  const onStop = () => {
+    dispatch({ type: 'STOP' });
+    addAlert({ variant: 'success', title: 'Stop pressed' });
+  }
+  const onPause = () => {
+    dispatch({ type: 'PAUSE' });
+    addAlert({ variant: 'success', title: 'Pause pressed' });
+  }
+  const onResume = () => {
+    dispatch({ type: 'RESUME' });
+    addAlert({ variant: 'success', title: 'Resume pressed' });
+  }
 
   const currentTime = Date.now();
 
   const onKeyPress = useMemo(() => (e: KeyboardEvent) => {
     if (e.code === 'Space') {
-      dispatch({ type: 'SPACE_PRESSED' });
+      if (e.shiftKey) {
+        dispatch({ type: 'BACKSPACE_PRESSED' });
+        addAlert({ variant: 'success', title: 'Backspace pressed' });
+      } else {
+        dispatch({ type: 'SPACE_PRESSED' });
+        addAlert({ variant: 'success', title: 'Space pressed' });  
+      }
     }
   }, []);
-
+  
   const onKeyUp = useMemo(() => (e: KeyboardEvent) => {
     if (e.code === 'Backspace') {
       dispatch({ type: 'BACKSPACE_PRESSED' });
+      addAlert({ variant: 'success', title: 'Backspace pressed' });
+    } else if (e.code === 'Space') {
+      document.body.style.overflow = 'auto';
+    }
+  }, []);
+
+  const onKeyDown = useMemo(() => (e: KeyboardEvent) => {
+    if (e.code === 'Space') {
+      document.body.style.overflow = 'hidden';
     }
   }, []);
 
@@ -66,41 +97,48 @@ export default function App() {
     console.warn('mount');
     document.addEventListener('keypress', onKeyPress);
     document.addEventListener('keyup', onKeyUp);
+    document.addEventListener('keydown', onKeyDown);
     return () => {
       console.warn('unmount');
       document.removeEventListener('keypress', onKeyPress);
       document.removeEventListener('keyup', onKeyUp);
+      document.removeEventListener('keydown', onKeyDown);
     };
   });
 
   return (
-    <div>
+    <>
+      <AlertGroup isToast>
+        {alerts && alerts.map(alert => <Alert {...alert} />)}
+      </AlertGroup>
 
-      <Form>
+      <Flex breakpointMods={[
+        {
+          modifier: FlexModifiers["justify-content-center"]
+        }
+      ]}>
+        <span>a</span>
+        <span>b</span>
+        <span>c</span>
+      </Flex>
 
-        <TimeInput
-          onChange={(time) => console.log('TimeInput onChange', time)}
-        />
+      <TimeInput
+        onChange={(time) => console.log('TimeInput onChange', time)}
+      />
+      <Countdown />
 
-        <div>
-          Last rendered
-          {currentTime}
-        </div>
-        <div>
-          {JSON.stringify(state)}
-        </div>
-
+      <div>
         <Button variant="primary" onClick={onStart}>Start</Button>
         <Button variant="primary" onClick={onStop}>Stop</Button>
         <Button variant="primary" onClick={onPause}>Pause</Button>
         <Button variant="primary" onClick={onResume}>Resume</Button>
-      </Form>
+      </div>
 
       <Table aria-label="Laps" cells={cells} rows={rows}>
         <TableHeader />
         <TableBody />
       </Table>
 
-    </div>
+    </>
   );
 }
