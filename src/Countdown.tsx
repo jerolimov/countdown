@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-export default function Countdown() {
+export interface CountdownProps {
+  paused: boolean,
+  until: number;
+}
+
+export default function Countdown({ until }: CountdownProps) {
   const [start] = useState(() => Date.now());
   const [frames, updateFrames] = useState<number>(0);
 
@@ -15,16 +20,14 @@ export default function Countdown() {
     */
   }, []);
 
-  const countdown = Date.now() - start;
-
   const countdownString = (
-    Math.floor(countdown / 1000 / 60 / 60) +
+    Math.floor(until / 1000 / 60 / 60) +
     ':' +
-    Math.floor(countdown / 1000 / 60) +
+    Math.floor(until / 1000 / 60) +
     ':' +
-    addPrefixZeros(Math.floor(countdown / 1000), 2) +
+    addPrefixZeros(Math.floor(until / 1000), 2) +
     '.' +
-    addPrefixZeros(countdown % 1000, 3)
+    addPrefixZeros(until % 1000, 3)
   );
 
   const fps = Math.round(frames / (Date.now() - start) * 1000);

@@ -8,8 +8,8 @@ describe('App', () => {
   //
   // Helper
   //
-  const getInputElementByLabelText = (matcher: Matcher) => {
-    const label = screen.getByLabelText(matcher);
+  const getFirstInputElementByLabelText = (matcher: Matcher) => {
+    const label = screen.getAllByLabelText(matcher)[0];
     expect(label).toBeTruthy();
     expect(label.parentElement).toBeTruthy();
     expect(label.parentElement!.lastElementChild).toBeTruthy();
@@ -19,13 +19,13 @@ describe('App', () => {
   it('renders', () => {
     render(<App />)
 
-    screen.getByLabelText(/day/i);
-    screen.getByLabelText(/hour/i);
-    screen.getByLabelText(/minute/i);
-    screen.getByLabelText(/second/i);
+    expect(screen.getAllByLabelText(/day/i)).toHaveLength(2);
+    expect(screen.getAllByLabelText(/hour/i)).toHaveLength(2);
+    expect(screen.getAllByLabelText(/minute/i)).toHaveLength(2);
+    expect(screen.getAllByLabelText(/second/i)).toHaveLength(2);
 
-    const dayInput = getInputElementByLabelText(/day/i);
-    const hourInput = getInputElementByLabelText(/hour/i);
+    const dayInput = getFirstInputElementByLabelText(/day/i);
+    const hourInput = getFirstInputElementByLabelText(/hour/i);
 
     fireEvent.change(dayInput, { target: {value: '1'} });
     fireEvent.change(hourInput, { target: {value: '2'} });
