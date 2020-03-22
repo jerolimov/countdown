@@ -1,8 +1,11 @@
-import React, { useReducer, useEffect, useMemo, useState } from 'react';
+import React, { useReducer, useEffect, useMemo } from 'react';
 import './App.css';
 
-import { Button, Flex, FlexModifiers, Alert, AlertProps, AlertGroup, AlertActionCloseButton, Expandable, Modal } from '@patternfly/react-core';
+import { Button, Flex, FlexModifiers, Alert, AlertGroup, Expandable, Modal } from '@patternfly/react-core';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
+
+import useAlerts from './hooks/useAlerts';
+import useModal from './hooks/useModal';
 
 import { reducer, initialState } from './CountdownReducer';
 import Countdown from './Countdown';
@@ -10,29 +13,7 @@ import TimeInput from './TimeInput';
 
 export default function App() {
 
-  const [alerts, setAlerts] = useState<AlertProps[]>([]);
-
-  const addAlert = (alert: AlertProps, timeout = 3000) => {
-    const key = Date.now();
-    setAlerts(alerts => [
-      ...alerts,
-      {
-        ...alert,
-        key,
-        action: (
-          <AlertActionCloseButton onClose={() => removeAlert(key)} />
-        ),
-      }
-    ]);
-    if (timeout > 0) {
-      setTimeout(() => removeAlert(key), timeout);
-    }
-  };
-
-  const removeAlert = (key: string | number) => {
-    console.warn('removeAlert', key, alerts);
-    setAlerts(alerts => alerts.filter(alert => alert.key !== key));
-  }
+  const alerts = useAlerts();
 
   const [state, dispatch] = useReducer(reducer, null, () => {
     try {
@@ -55,27 +36,27 @@ export default function App() {
 
   const onStart = () => {
     dispatch({ type: 'STARTED', at: new Date(), countdownInMs: 30000 });
-    addAlert({ variant: 'success', title: 'Start pressed' });
+    alerts.addAlert({ variant: 'success', title: 'Start pressed' });
   }
   const onStop = () => {
     dispatch({ type: 'STOPPED', at: new Date() });
-    addAlert({ variant: 'success', title: 'Stop pressed' });
+    alerts.addAlert({ variant: 'success', title: 'Stop pressed' });
   }
   const onPause = () => {
     dispatch({ type: 'PAUSED', at: new Date() });
-    addAlert({ variant: 'success', title: 'Pause pressed' });
+    alerts.addAlert({ variant: 'success', title: 'Pause pressed' });
   }
   const onResume = () => {
     dispatch({ type: 'RESUMED', at: new Date() });
-    addAlert({ variant: 'success', title: 'Resume pressed' });
+    alerts.addAlert({ variant: 'success', title: 'Resume pressed' });
   }
   const onNewLap = () => {
     dispatch({ type: 'NEW_LAP', at: new Date() });
-    addAlert({ variant: 'success', title: 'New lap!' });  
+    alerts.addAlert({ variant: 'success', title: 'New lap!' });  
   }
   const onUndoNewLap = () => {
     dispatch({ type: 'UNDO_NEW_LAP' });
-    addAlert({ variant: 'success', title: 'Undo new lap!' });
+    alerts.addAlert({ variant: 'success', title: 'Undo new lap!' });
   }
 
   const onKeyPress = useMemo(() => (e: KeyboardEvent) => {
@@ -131,25 +112,24 @@ export default function App() {
 
   const countdownUntil = state.restTimeInMs;
 
-  const [isOpen, setIsOpen] = useState(false);
-  const showDialog = () => setIsOpen(true);
-  const closeDialog = () => setIsOpen(false);
+  const deleteModal = useModal();
 
   return (
     <>
       <AlertGroup isToast>
-        {alerts && alerts.map(alert => <Alert {...alert} />)}
+        {alerts.alerts.map(alert => <Alert {...alert} />)}
       </AlertGroup>
+
       <Modal
         isSmall
         title="Stop timer"
-        isOpen={isOpen}
-        onClose={closeDialog}
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.close}
         actions={[
-          <Button key="confirm" variant="danger" onClick={() => { onStop(); closeDialog(); }}>
+          <Button key="confirm" variant="danger" onClick={() => { onStop(); deleteModal.close(); }}>
             Confirm
           </Button>,
-          <Button key="cancel" variant="link" onClick={closeDialog}>
+          <Button key="cancel" variant="link" onClick={deleteModal.close}>
             Cancel
           </Button>
         ]}
@@ -173,28 +153,28 @@ export default function App() {
 
       <h1>Countdown coding challenge</h1>
 
-      <h2>Countdown</h2>
-      <TimeInput
-        onChange={(time) => console.log('TimeInput onChange', time)}
-      />
-
-      <h2>Threshold</h2>
-      <TimeInput
-        onChange={(time) => console.log('TimeInput onChange', time)}
-      />
-
-      <Countdown paused={!!state.pausedAt} until={countdownUntil} />
-
       <div>
         {
           !state.startedAt ?
             <>
+              <h2>Countdown</h2>
+              <TimeInput
+                onChange={(time) => console.log('TimeInput onChange', time)}
+              />
+
+              <h2>Threshold</h2>
+              <TimeInput
+                onChange={(time) => console.log('TimeInput onChange', time)}
+              />
+
               <Button variant="primary" onClick={onStart}>
                 Start
               </Button>
             </>
           :
             <>
+              <Countdown paused={!!state.pausedAt} until={countdownUntil} />
+
               <Button variant="primary" onClick={!state.pausedAt ? onPause : onResume}>
                 {!state.pausedAt ? 'Pause' : 'Resume'}
               </Button>
@@ -204,19 +184,19 @@ export default function App() {
               <Button variant="secondary" isDisabled={state.laps.length < 1} onClick={onUndoNewLap}>
                 Undo new lap
               </Button>
-
-              <br/><br/>
-              <Button variant="danger" onClick={showDialog}>
+              <Button variant="danger" onClick={deleteModal.open}>
                 Stop
               </Button>
+
+              <br/><br/>
+
+              <Table aria-label="Laps" cells={cells} rows={rows}>
+                <TableHeader />
+                <TableBody />
+              </Table>
             </>
         }
       </div>
-
-      <Table aria-label="Laps" cells={cells} rows={rows}>
-        <TableHeader />
-        <TableBody />
-      </Table>
 
       <Expandable toggleText="Internal state (for debugging only)">
         <pre style={{ margin: '20px', border: '1px solid gray', padding: '10px' }}>
