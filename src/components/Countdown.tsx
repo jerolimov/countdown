@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import { getCountdownAsString } from '../utils/date';
+
 export interface CountdownProps {
   paused: boolean,
   until: number;
@@ -23,15 +25,7 @@ export default function Countdown({ paused, until }: CountdownProps) {
 
   const restInMs = Date.now() - start - until;
 
-  const countdownString = (
-    Math.floor(restInMs / 1000 / 60 / 60) +
-    ':' +
-    Math.floor(restInMs / 1000 / 60) +
-    ':' +
-    addPrefixZeros(Math.floor(restInMs / 1000), 2) +
-    '.' +
-    addPrefixZeros(restInMs % 1000, 3)
-  );
+  const countdownString = getCountdownAsString(restInMs);
 
   const fps = Math.round(frames / (Date.now() - start) * 1000);
 
@@ -47,12 +41,4 @@ export default function Countdown({ paused, until }: CountdownProps) {
       {fps}
     </div>
   );
-}
-
-const addPrefixZeros = (x: number, length: number): string => {
-  let result = x.toString();
-  while (result.length < length) {
-    result = '0' + result;
-  }
-  return result;
 }

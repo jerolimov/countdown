@@ -9,7 +9,7 @@ describe('Countdown', () => {
     render(<Countdown paused until={0} />);
 
     // Assert labels
-    screen.getByText('0:0:00.000');
+    screen.getByText(/0:0:00.\d\d\d/);
   });
 
 });

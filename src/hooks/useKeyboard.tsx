@@ -5,10 +5,10 @@ export default function useKeyboard(
     listener: (event: KeyboardEvent) => void,
 ) {
   useEffect(() => {
-    console.warn('mount');
+    // console.warn('mount');
     document.addEventListener(eventType, listener);
     return () => {
-      console.warn('unmount');
+      // console.warn('unmount');
       document.removeEventListener(eventType, listener);
     };
   }, [eventType, listener]);    
