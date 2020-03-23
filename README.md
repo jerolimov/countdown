@@ -6,6 +6,7 @@
 * It uses [PatternFly v4](https://www.patternfly.org/v4/) for
   [React](https://github.com/patternfly/patternfly-react), for me it was the first time. ;)
 * Tests are based on the [testing-library](https://testing-library.com/) (with [react-testing-library](https://github.com/testing-library/react-testing-library) and [react-hooks-testing-library](https://github.com/testing-library/react-hooks-testing-library))
+* Design documents / mockups created with [excalidraw.com](https://excalidraw.com/)
 
 Bootstrapped with this commands:
 
@@ -17,7 +18,7 @@ npm install --save-dev @testing-library/react @testing-library/react-hooks
 npm install --save-dev react-test-renderer@^16.13.0
 ```
 
-## Checkout and local setup
+## Checkout and local setup (an online version is available below)
 
 This project requires node with npm. To clone and install the project dependencies please run the following commands:
 
@@ -33,7 +34,11 @@ In the project directory, you can run `npm start` to start a local development s
 
 To run the tests run `npm test` or `npm run coverage`. After the coverage run, you find the coverage in `coverage/lcov-report/index.html`.
 
-Other available commands: `npm run build` and `npm run netlify`. You find the latest master version (incl. the coverage, build with the 2nd command) automatically on:
+Other available commands: `npm run build` and `npm run netlify` (see next chapter).
+
+## Online version
+
+You find the latest master version (incl. the test coverage) automatically on:
 
 * [https://countdown-challenge.netlify.com/](https://countdown-challenge.netlify.com/)
 * [https://countdown-challenge.netlify.com/coverage/](https://countdown-challenge.netlify.com/coverage/index.html)
