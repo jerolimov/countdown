@@ -6,6 +6,8 @@
 * It uses [PatternFly v4](https://www.patternfly.org/v4/) for
   [React](https://github.com/patternfly/patternfly-react), for me it was the first time. ;)
 * Tests are based on the [testing-library](https://testing-library.com/) (with [react-testing-library](https://github.com/testing-library/react-testing-library) and [react-hooks-testing-library](https://github.com/testing-library/react-hooks-testing-library))
+* Tests run automatically on [GitHub actions](https://github.com/jerolimov/countdown/actions)
+  and on netlify (incl. [code coverage](https://countdown-challenge.netlify.com/coverage/index.html))
 * Design documents / mockups created with [excalidraw.com](https://excalidraw.com/)
 
 Bootstrapped with this commands:
