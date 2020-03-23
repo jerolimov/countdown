@@ -1,7 +1,8 @@
 import React from 'react';
 import { render, fireEvent, screen, Matcher } from '@testing-library/react';
 
-import TimeInput, { Time } from './TimeInput';
+import TimeInput from './TimeInput';
+import { Time } from '../types';
 
 describe('TimeInput', () => {
 
