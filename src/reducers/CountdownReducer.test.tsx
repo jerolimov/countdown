@@ -1,4 +1,5 @@
-import { reducer, initialState, CounterAction, CounterState } from './CountdownReducer';
+import { reducer, initialState, CounterAction } from './CountdownReducer';
+import { CounterState } from '../types';
 
 describe('reducer', () => {
 
@@ -9,6 +10,8 @@ describe('reducer', () => {
       countdownInMs: 30000,
     }
     const expectedState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
@@ -19,6 +22,8 @@ describe('reducer', () => {
 
   it('should switch from STARTED to STOPPED after STOPPED was received', () => {
     const prevState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
@@ -29,6 +34,8 @@ describe('reducer', () => {
       at: new Date('2020-03-22 14:30:45'),
     }
     const expectedState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: null,
       pausedAt: null,
       restTimeInMs: 30000,
@@ -39,6 +46,8 @@ describe('reducer', () => {
 
   it('should switch from STARTED to PAUSED after PAUSED was received', () => {
     const prevState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
@@ -49,6 +58,8 @@ describe('reducer', () => {
       at: new Date('2020-03-22 14:30:45'),
     }
     const expectedState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: new Date('2020-03-22 14:30:45'),
       restTimeInMs: 30000,
@@ -59,6 +70,8 @@ describe('reducer', () => {
 
   it('should switch from PAUSED to STARTED after RESUMED was received', () => {
     const prevState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: new Date('2020-03-22 14:30:45'),
       restTimeInMs: 30000,
@@ -69,6 +82,8 @@ describe('reducer', () => {
       at: new Date('2020-03-22 14:30:50'),
     }
     const expectedState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 25000,
@@ -79,6 +94,8 @@ describe('reducer', () => {
 
   it('should create a new lap when NEW_LAP was received', () => {
     const prevState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
@@ -89,6 +106,8 @@ describe('reducer', () => {
       at: new Date('2020-03-22 14:00:45'),
     }
     const expectedState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
@@ -101,6 +120,8 @@ describe('reducer', () => {
 
   it('should create another new lap when NEW_LAP was received', () => {
     const prevState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
@@ -113,6 +134,8 @@ describe('reducer', () => {
       at: new Date('2020-03-22 14:00:55'),
     }
     const expectedState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
@@ -126,6 +149,8 @@ describe('reducer', () => {
 
   it('should remove a lap when UNDO_NEW_LAP was received', () => {
     const prevState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
@@ -137,6 +162,8 @@ describe('reducer', () => {
       type: 'UNDO_NEW_LAP',
     }
     const expectedState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
@@ -147,6 +174,8 @@ describe('reducer', () => {
 
   it('should remove a second lap when UNDO_NEW_LAP was received', () => {
     const prevState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
@@ -159,6 +188,8 @@ describe('reducer', () => {
       type: 'UNDO_NEW_LAP',
     }
     const expectedState: CounterState = {
+      countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+      thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
