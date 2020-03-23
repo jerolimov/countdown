@@ -29,13 +29,13 @@ describe('LapTable', () => {
     // Assert column content
     const rowWithLap1 = screen.getByText('1').parentElement!;
     getByText(rowWithLap1, '1')
-    getByText(rowWithLap1, '15000')
+    getByText(rowWithLap1, '00:15.000')
     getByText(rowWithLap1, '3/22/2020')
     getByText(rowWithLap1, '2:00:45 PM')
 
     const rowWithLap2 = screen.getByText('2').parentElement!;
     getByText(rowWithLap2, '2')
-    getByText(rowWithLap2, '10000')
+    getByText(rowWithLap2, '00:10.000')
     getByText(rowWithLap2, '3/22/2020')
     getByText(rowWithLap2, '2:00:55 PM')
   });
