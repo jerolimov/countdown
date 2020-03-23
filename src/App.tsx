@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useMemo } from 'react';
+import React, { useState, useReducer, useEffect, useMemo } from 'react';
 
 import { Title, Button, Alert, AlertGroup, Expandable, Flex, FlexModifiers, Modal } from '@patternfly/react-core';
 import { AddCircleOIcon, HelpIcon, HistoryIcon } from '@patternfly/react-icons';
@@ -9,13 +9,23 @@ import LapTable from './components/LapTable';
 
 import useAlerts from './hooks/useAlerts';
 import useModal from './hooks/useModal';
+import useKeyboard from './hooks/useKeyboard';
 
 import { reducer, initialState } from './reducers/CountdownReducer';
 
+import { Time } from './types';
+
 export default function App() {
-
+  // UI state
   const alerts = useAlerts();
+  const deleteModal = useModal();
+  const helpModal = useModal();
 
+  // Input countdown and threshold
+  const [countdown, setCountdown] = useState<Time>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [threshold, setThreshold] = useState<Time>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  // Running countdown
   const [state, dispatch] = useReducer(reducer, null, () => {
     try {
       const restoredState = JSON.parse(localStorage.getItem('countdown_state') || "{}");
@@ -30,75 +40,66 @@ export default function App() {
       return initialState;
     }
   });
-
   useEffect(() => {
     localStorage.setItem(('countdown_state'), JSON.stringify(state));
   }, [state])
 
-  const onStart = () => {
-    dispatch({ type: 'STARTED', at: new Date(), countdownInMs: 30000 });
+  // Button callbacks
+  const onStart = useMemo(() => () => {
+    const countdownInMs =
+        countdown.days * 24 * 60 * 60 * 1000 +
+        countdown.hours * 60 * 60 * 1000 +
+        countdown.minutes * 60 * 1000 +
+        countdown.seconds * 1000;
+    dispatch({ type: 'STARTED', at: new Date(), countdownInMs });
     alerts.setAlert({ variant: 'success', title: 'Start pressed' });
-  }
-  const onStop = () => {
+  }, [alerts, countdown]);
+  const onStop = useMemo(() => () => {
     dispatch({ type: 'STOPPED', at: new Date() });
     alerts.setAlert({ variant: 'success', title: 'Stop pressed' });
-  }
-  const onPause = () => {
+  }, [alerts]);
+  const onPause = useMemo(() => () => {
     dispatch({ type: 'PAUSED', at: new Date() });
     alerts.setAlert({ variant: 'success', title: 'Pause pressed' });
-  }
-  const onResume = () => {
+  }, [alerts]);
+  const onResume = useMemo(() => () => {
     dispatch({ type: 'RESUMED', at: new Date() });
     alerts.setAlert({ variant: 'success', title: 'Resume pressed' });
-  }
-  const onNewLap = () => {
+  }, [alerts]);
+  const onNewLap = useMemo(() => () => {
     dispatch({ type: 'NEW_LAP', at: new Date() });
     alerts.setAlert({ variant: 'success', title: 'New lap!' });  
-  }
-  const onUndoNewLap = () => {
+  }, [alerts]);
+  const onUndoNewLap = useMemo(() => () => {
     dispatch({ type: 'UNDO_NEW_LAP' });
     alerts.setAlert({ variant: 'success', title: 'Undo new lap!' });
-  }
+  }, [alerts]);
 
+  // Keyboard hooks
   const onKeyPress = useMemo(() => (e: KeyboardEvent) => {
     if (e.code === 'Space' && !e.shiftKey) {
       onNewLap();
     } else if (e.code === 'Space' && e.shiftKey) {
       onUndoNewLap();
     }
-  }, []);
-
+  }, [onNewLap, onUndoNewLap]);
   const onKeyUp = useMemo(() => (e: KeyboardEvent) => {
     if (e.code === 'Backspace') {
       onUndoNewLap();
     } else if (e.code === 'Space') {
       document.body.style.overflow = 'auto';
     }
-  }, []);
-
+  }, [onUndoNewLap]);
   const onKeyDown = useMemo(() => (e: KeyboardEvent) => {
     if (e.code === 'Space') {
       document.body.style.overflow = 'hidden';
     }
   }, []);
-
-  useEffect(() => {
-    console.warn('mount');
-    document.addEventListener('keypress', onKeyPress);
-    document.addEventListener('keyup', onKeyUp);
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      console.warn('unmount');
-      document.removeEventListener('keypress', onKeyPress);
-      document.removeEventListener('keyup', onKeyUp);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  });
+  useKeyboard('keypress', onKeyPress);
+  useKeyboard('keyup', onKeyUp);
+  useKeyboard('keydown', onKeyDown);
 
   const countdownUntil = state.restTimeInMs;
-
-  const deleteModal = useModal();
-  const helpModal = useModal();
 
   return (
     <>
@@ -160,7 +161,8 @@ export default function App() {
               </Flex>
               <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
                 <TimeInput
-                  onChange={(time) => console.log('TimeInput onChange', time)}
+                  value={countdown}
+                  onChange={setCountdown}
                 />
               </Flex>
 
@@ -171,7 +173,8 @@ export default function App() {
               </Flex>
               <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
                 <TimeInput
-                  onChange={(time) => console.log('TimeInput onChange', time)}
+                  value={threshold}
+                  onChange={setThreshold}
                 />
               </Flex>
 

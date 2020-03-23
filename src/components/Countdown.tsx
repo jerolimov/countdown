@@ -5,29 +5,32 @@ export interface CountdownProps {
   until: number;
 }
 
-export default function Countdown({ until }: CountdownProps) {
+export default function Countdown({ paused, until }: CountdownProps) {
   const [start] = useState(() => Date.now());
   const [frames, updateFrames] = useState<number>(0);
 
+  // Endless re-rending loop (if not paused)
   useEffect(() => {
-    /*
-    const timer = setInterval(() => {
+    const timer = !paused ? setInterval(() => {
       updateFrames(frame => frame + 1);
-    }, 500);
+    }, 100) : null;
     return () => {
-      clearInterval(timer);
+      if (timer) {
+        clearInterval(timer);
+      }
     };
-    */
-  }, []);
+  }, [paused]);
+
+  const restInMs = Date.now() - start - until;
 
   const countdownString = (
-    Math.floor(until / 1000 / 60 / 60) +
+    Math.floor(restInMs / 1000 / 60 / 60) +
     ':' +
-    Math.floor(until / 1000 / 60) +
+    Math.floor(restInMs / 1000 / 60) +
     ':' +
-    addPrefixZeros(Math.floor(until / 1000), 2) +
+    addPrefixZeros(Math.floor(restInMs / 1000), 2) +
     '.' +
-    addPrefixZeros(until % 1000, 3)
+    addPrefixZeros(restInMs % 1000, 3)
   );
 
   const fps = Math.round(frames / (Date.now() - start) * 1000);
