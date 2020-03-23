@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { getCountdownAsString } from '../utils/date';
 
 export interface CountdownProps {
+  startedAt: Date,
   paused: boolean,
-  until: number;
+  restTimeInMs: number,
 }
 
-export default function Countdown({ paused, until }: CountdownProps) {
-  const [start] = useState(() => Date.now());
-  const [frames, updateFrames] = useState<number>(0);
+export default function Countdown({ startedAt, paused, restTimeInMs }: CountdownProps) {
+  const [_, updateFrames] = useState<number>(0);
 
   // Endless re-rending loop (if not paused)
   useEffect(() => {
@@ -23,15 +23,23 @@ export default function Countdown({ paused, until }: CountdownProps) {
     };
   }, [paused]);
 
-  const restInMs = Date.now() - start - until;
-
-  const countdownString = getCountdownAsString(restInMs);
-
-  const fps = Math.round(frames / (Date.now() - start) * 1000);
+  const untilInMs = startedAt.getTime() - Date.now() + restTimeInMs;
+  const countdownString = getCountdownAsString(untilInMs);
 
   return (
     <div style={{ textAlign: 'center' }}>
-      Countdown:<br/>
+      {/*
+      <p>
+        startedAt: {startedAt?.toISOString()}
+      </p>
+      <p>
+        untilInMs: {untilInMs}
+      </p>
+      <p>
+        paused: {paused ? 'true' : 'false'}
+      </p>
+      */}
+      <strong>Countdown:</strong><br/>
       <pre style={{ fontSize: 24 }}>{countdownString}</pre>
     </div>
   );

@@ -13,7 +13,7 @@ export function getCountdownAsString(timeInMs: number): string {
       ':' +
       addPrefixZeros(duration.seconds(), 2) +
       '.' +
-      addPrefixZeros(duration.milliseconds(), 3);
+      addPrefixZeros(Math.round(duration.milliseconds()), 3);
 }
 
 // Currently unused

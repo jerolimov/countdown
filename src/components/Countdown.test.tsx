@@ -5,11 +5,14 @@ import Countdown from './Countdown';
 
 describe('Countdown', () => {
 
-  it('should render four labeled input fields', () => {
-    render(<Countdown paused until={0} />);
-
-    // Assert labels
+  it('render rest time successfully', () => {
+    // Test without rest time
+    render(<Countdown startedAt={new Date()} paused restTimeInMs={0.500} />);
     screen.getByText(/00:00.\d{3}/);
+
+    // Test with 30 seconds rest time
+    render(<Countdown startedAt={new Date()} paused restTimeInMs={30500} />);
+    screen.getByText(/00:30.\d{3}/);
   });
 
 });

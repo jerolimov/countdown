@@ -99,8 +99,6 @@ export default function App() {
   useKeyboard('keyup', onKeyUp);
   useKeyboard('keydown', onKeyDown);
 
-  const countdownUntil = state.restTimeInMs;
-
   return (
     <>
       <AlertGroup isToast>
@@ -189,7 +187,11 @@ export default function App() {
           :
             <>
               <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
-                <Countdown paused={!!state.pausedAt} until={countdownUntil} />
+                <Countdown
+                  startedAt={state.startedAt}
+                  paused={!!state.pausedAt}
+                  restTimeInMs={state.restTimeInMs}
+                />
               </Flex>
 
               <Flex
