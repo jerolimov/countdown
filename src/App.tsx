@@ -1,6 +1,7 @@
 import React, { useReducer, useEffect, useMemo } from 'react';
 
 import { Title, Button, Alert, AlertGroup, Expandable, Flex, FlexModifiers, Modal } from '@patternfly/react-core';
+import { AddCircleOIcon, HelpIcon, HistoryIcon } from '@patternfly/react-icons';
 
 import Countdown from './components/Countdown';
 import TimeInput from './components/TimeInput';
@@ -97,6 +98,7 @@ export default function App() {
   const countdownUntil = state.restTimeInMs;
 
   const deleteModal = useModal();
+  const helpModal = useModal();
 
   return (
     <>
@@ -117,14 +119,30 @@ export default function App() {
             Cancel
           </Button>
         ]}
-        isFooterLeftAligned
       >
         Are you sure?
+      </Modal>
+
+      <Modal
+        isSmall
+        title="Help"
+        isOpen={helpModal.isOpen}
+        onClose={helpModal.close}
+        actions={[
+          <Button key="cancel" variant="link" onClick={helpModal.close}>
+            Close
+          </Button>
+        ]}
+      >
+        Space - Create new lap<br/><br/>
+        Shift Space - Undo last new lap<br/><br/>
+        Backspace (Delete) - Undo last new lap<br/><br/>
       </Modal>
 
       <Flex breakpointMods={[
         { modifier: FlexModifiers.column },
         { modifier: FlexModifiers["align-content-center"] },
+        { modifier: FlexModifiers["space-items-2xl"] },
       ]}>
         <Flex>
           <Title headingLevel="h1" size="4xl">
@@ -173,14 +191,17 @@ export default function App() {
                 <Button variant="primary" onClick={!state.pausedAt ? onPause : onResume}>
                   {!state.pausedAt ? 'Pause' : 'Resume'}
                 </Button>
-                <Button variant="secondary" onClick={onNewLap}>
-                  New lap
+                <Button variant="secondary" aria-label="New lap" onClick={onNewLap}>
+                  <AddCircleOIcon /> New lap
                 </Button>
-                <Button variant="secondary" isDisabled={state.laps.length < 1} onClick={onUndoNewLap}>
-                  Undo new lap
+                <Button variant="secondary" aria-label="Undo new lap" isDisabled={state.laps.length < 1} onClick={onUndoNewLap}>
+                  <HistoryIcon /> Undo new lap
                 </Button>
                 <Button variant="danger" onClick={deleteModal.open}>
                   Stop
+                </Button>
+                <Button variant="link" aria-label="Open help" onClick={helpModal.open}>
+                  <HelpIcon />
                 </Button>
               </Flex>
 
