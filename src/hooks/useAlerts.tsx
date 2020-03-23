@@ -22,6 +22,22 @@ export default function useAlerts() {
     }
   };
 
+  const setAlert = (alert: AlertProps, timeout = 3000) => {
+    const key = alert.key || Date.now();
+    setAlerts([
+      {
+        ...alert,
+        key,
+        action: (
+          <AlertActionCloseButton onClose={() => removeAlert(key)} />
+        ),
+      }
+    ]);
+    if (timeout > 0) {
+      setTimeout(() => removeAlert(key), timeout);
+    }
+  };
+
   const removeAlert = (key: string | number) => {
     setAlerts(alerts => alerts.filter(alert => alert.key !== key));
   }
@@ -29,6 +45,7 @@ export default function useAlerts() {
   return {
     alerts,
     addAlert,
+    setAlert,
     removeAlert,
   };
 }

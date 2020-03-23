@@ -1,7 +1,6 @@
 import React, { useReducer, useEffect, useMemo } from 'react';
-import './App.css';
 
-import { Button, Flex, FlexModifiers, Alert, AlertGroup, Expandable, Modal } from '@patternfly/react-core';
+import { Title, Button, Alert, AlertGroup, Expandable, Flex, FlexModifiers, Modal, FlexItem } from '@patternfly/react-core';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 
 import useAlerts from './hooks/useAlerts';
@@ -36,27 +35,27 @@ export default function App() {
 
   const onStart = () => {
     dispatch({ type: 'STARTED', at: new Date(), countdownInMs: 30000 });
-    alerts.addAlert({ variant: 'success', title: 'Start pressed' });
+    alerts.setAlert({ variant: 'success', title: 'Start pressed' });
   }
   const onStop = () => {
     dispatch({ type: 'STOPPED', at: new Date() });
-    alerts.addAlert({ variant: 'success', title: 'Stop pressed' });
+    alerts.setAlert({ variant: 'success', title: 'Stop pressed' });
   }
   const onPause = () => {
     dispatch({ type: 'PAUSED', at: new Date() });
-    alerts.addAlert({ variant: 'success', title: 'Pause pressed' });
+    alerts.setAlert({ variant: 'success', title: 'Pause pressed' });
   }
   const onResume = () => {
     dispatch({ type: 'RESUMED', at: new Date() });
-    alerts.addAlert({ variant: 'success', title: 'Resume pressed' });
+    alerts.setAlert({ variant: 'success', title: 'Resume pressed' });
   }
   const onNewLap = () => {
     dispatch({ type: 'NEW_LAP', at: new Date() });
-    alerts.addAlert({ variant: 'success', title: 'New lap!' });  
+    alerts.setAlert({ variant: 'success', title: 'New lap!' });  
   }
   const onUndoNewLap = () => {
     dispatch({ type: 'UNDO_NEW_LAP' });
-    alerts.addAlert({ variant: 'success', title: 'Undo new lap!' });
+    alerts.setAlert({ variant: 'success', title: 'Undo new lap!' });
   }
 
   const onKeyPress = useMemo(() => (e: KeyboardEvent) => {
@@ -139,70 +138,83 @@ export default function App() {
       </Modal>
 
       <Flex breakpointMods={[
-        {
-          modifier: FlexModifiers["justify-content-flex-start"],
-        },
-        {
-          modifier: FlexModifiers["justify-content-center"]
-        }
+        { modifier: FlexModifiers.column },
+        { modifier: FlexModifiers["align-content-center"] },
       ]}>
-        <span>a</span>
-        <span>b</span>
-        <span>c</span>
-      </Flex>
+        <Flex>
+          <Title headingLevel="h1" size="4xl">
+            Countdown coding challenge
+          </Title>
+        </Flex>
 
-      <h1>Countdown coding challenge</h1>
-
-      <div>
         {
           !state.startedAt ?
             <>
-              <h2>Countdown</h2>
-              <TimeInput
-                onChange={(time) => console.log('TimeInput onChange', time)}
-              />
+              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <Title headingLevel="h2" size="3xl">
+                  Countdown
+                </Title>
+              </Flex>
+              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <TimeInput
+                  onChange={(time) => console.log('TimeInput onChange', time)}
+                />
+              </Flex>
 
-              <h2>Threshold</h2>
-              <TimeInput
-                onChange={(time) => console.log('TimeInput onChange', time)}
-              />
+              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <Title headingLevel="h2" size="3xl">
+                  Threshold
+                </Title>
+              </Flex>
+              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <TimeInput
+                  onChange={(time) => console.log('TimeInput onChange', time)}
+                />
+              </Flex>
 
-              <Button variant="primary" onClick={onStart}>
-                Start
-              </Button>
+              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <Button variant="primary" onClick={onStart}>
+                  Start
+                </Button>
+              </Flex>
             </>
           :
             <>
-              <Countdown paused={!!state.pausedAt} until={countdownUntil} />
+              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <Countdown paused={!!state.pausedAt} until={countdownUntil} />
+              </Flex>
 
-              <Button variant="primary" onClick={!state.pausedAt ? onPause : onResume}>
-                {!state.pausedAt ? 'Pause' : 'Resume'}
-              </Button>
-              <Button variant="secondary" onClick={onNewLap}>
-                New lap
-              </Button>
-              <Button variant="secondary" isDisabled={state.laps.length < 1} onClick={onUndoNewLap}>
-                Undo new lap
-              </Button>
-              <Button variant="danger" onClick={deleteModal.open}>
-                Stop
-              </Button>
+              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <Button variant="primary" onClick={!state.pausedAt ? onPause : onResume}>
+                  {!state.pausedAt ? 'Pause' : 'Resume'}
+                </Button>
+                <Button variant="secondary" onClick={onNewLap}>
+                  New lap
+                </Button>
+                <Button variant="secondary" isDisabled={state.laps.length < 1} onClick={onUndoNewLap}>
+                  Undo new lap
+                </Button>
+                <Button variant="danger" onClick={deleteModal.open}>
+                  Stop
+                </Button>
+              </Flex>
 
-              <br/><br/>
-
-              <Table aria-label="Laps" cells={cells} rows={rows}>
-                <TableHeader />
-                <TableBody />
-              </Table>
+              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <Table aria-label="Laps" cells={cells} rows={rows}>
+                  <TableHeader />
+                  <TableBody />
+                </Table>
+              </Flex>
             </>
         }
-      </div>
 
-      <Expandable toggleText="Internal state (for debugging only)">
-        <pre style={{ margin: '20px', border: '1px solid gray', padding: '10px' }}>
-          {JSON.stringify(state, null, 2)}
-        </pre>
-      </Expandable>
+        <br/><br/>
+        <Expandable toggleText="Internal state (for debugging only)">
+          <pre style={{ margin: '20px', border: '1px solid gray', padding: '10px' }}>
+            {JSON.stringify(state, null, 2)}
+          </pre>
+        </Expandable>
+      </Flex>
     </>
   );
 }
