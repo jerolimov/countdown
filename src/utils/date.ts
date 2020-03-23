@@ -1,6 +1,10 @@
 import * as moment from 'moment';
 
-export function getCountdownAsString(timeInMs: number): string {
+export function getTimeWithMilliseconds(timeInMs: number): string {
+  return getTimeWithoutMilliseconds(timeInMs) + '.' + getTimeMilliseconds(timeInMs);
+}
+
+export function getTimeWithoutMilliseconds(timeInMs: number): string {
   const duration = moment.duration(Math.abs(timeInMs));
 
   const showDays = duration.asDays() >= 1;
@@ -11,14 +15,11 @@ export function getCountdownAsString(timeInMs: number): string {
       (showHours ? (addPrefixZeros(duration.hours(), 2) + ':') : '') +
       addPrefixZeros(duration.minutes(), 2) +
       ':' +
-      addPrefixZeros(duration.seconds(), 2) +
-      '.' +
-      addPrefixZeros(Math.round(duration.milliseconds()), 3);
+      addPrefixZeros(duration.seconds(), 2);
 }
 
-// Currently unused
-export function getMillisecondsAsString(timeInMs: number) {
-  return addPrefixZeros(Math.abs(timeInMs) % 1000, 3);
+export function getTimeMilliseconds(timeInMs: number) {
+  return addPrefixZeros(Math.abs(Math.round(timeInMs)) % 1000, 3);
 }
 
 function addPrefixZeros(n: number, length: number): string {
