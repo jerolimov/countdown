@@ -146,7 +146,7 @@ export default function App() {
         { modifier: FlexModifiers["space-items-2xl"] },
       ]}>
         <Flex>
-          <Title headingLevel="h1" size="4xl">
+          <Title headingLevel="h1" size="4xl" style={{ textAlign: 'center', marginTop: '20px' }}>
             Countdown coding challenge
           </Title>
         </Flex>
@@ -190,7 +190,12 @@ export default function App() {
                 <Countdown paused={!!state.pausedAt} until={countdownUntil} />
               </Flex>
 
-              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+              <Flex
+                breakpointMods={[
+                  { modifier: FlexModifiers["align-self-center"] },
+                  { modifier: FlexModifiers["justify-content-center"] },
+                ]}
+              >
                 <Button variant="primary" onClick={!state.pausedAt ? onPause : onResume}>
                   {!state.pausedAt ? 'Pause' : 'Resume'}
                 </Button>
