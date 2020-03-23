@@ -11,9 +11,9 @@ import useAlerts from './hooks/useAlerts';
 import useModal from './hooks/useModal';
 import useKeyboard from './hooks/useKeyboard';
 
-import { reducer, initialState } from './reducers/CountdownReducer';
-
-import { Time } from './types';
+import { reducer } from './reducers/CountdownReducer';
+import { stringifyCounterState, parseCounterState } from './utils/persistance';
+import { getTimeWithoutMilliseconds } from './utils/date';
 
 export default function App() {
   // UI state
@@ -21,39 +21,54 @@ export default function App() {
   const deleteModal = useModal();
   const helpModal = useModal();
 
-  // Input countdown and threshold
-  const [countdown, setCountdown] = useState<Time>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-  const [threshold, setThreshold] = useState<Time>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  // Running countdown
+  // Countdown state
   const [state, dispatch] = useReducer(reducer, null, () => {
-    try {
-      const restoredState = JSON.parse(localStorage.getItem('countdown_state') || "{}");
-      return {
-        startedAt: restoredState?.startedAt ? new Date(restoredState?.startedAt) : null,
-        pausedAt: restoredState?.pausedAt ? new Date(restoredState?.pausedAt) : null,
-        restTimeInMs: restoredState?.restTimeInMs ?? null,
-        laps: restoredState?.laps?.map((lap: any) => ({ at: new Date(lap.at), timeInMs: lap.timeInMs })) ?? [],
-      };
-    } catch (error) {
-      console.warn('error', error);
-      return initialState;
-    }
+    return parseCounterState(localStorage.getItem('countdown_state') || "{}")
   });
   useEffect(() => {
-    localStorage.setItem(('countdown_state'), JSON.stringify(state));
-  }, [state])
+    localStorage.setItem(('countdown_state'), stringifyCounterState(state));
+  }, [state]);
+
+  // Notifiy about thresholds
+  const [thresholdTimer] = useState<Array<any>>([]);
+  useEffect(() => {
+    console.log('mount');
+    if (state.startedAt && !state.pausedAt) {
+      state.thresholds.forEach((threshold) => {
+        const countdownInMs =
+            state.restTimeInMs -
+            threshold.days * 24 * 60 * 60 * 1000 -
+            threshold.hours * 60 * 60 * 1000 -
+            threshold.minutes * 60 * 1000 -
+            threshold.seconds * 1000;
+        const countdownTimeString = getTimeWithoutMilliseconds(countdownInMs);
+        if (countdownInMs > 0) {
+          thresholdTimer.push(setTimeout(() => {
+            alerts.addAlert({
+              variant: 'warning',
+              title: `Threshold ${countdownTimeString} reached!`,
+            }, 10000);
+          }, countdownInMs));
+        }
+      });
+    }
+    return () => {
+      console.log('unmount');
+      thresholdTimer.forEach(timer => clearTimeout(timer));
+      thresholdTimer.splice(0); // Remove all entries without rerendering!
+    }
+  }, [state.startedAt, state.pausedAt, state.thresholds])
 
   // Button callbacks
   const onStart = useMemo(() => () => {
     const countdownInMs =
-        countdown.days * 24 * 60 * 60 * 1000 +
-        countdown.hours * 60 * 60 * 1000 +
-        countdown.minutes * 60 * 1000 +
-        countdown.seconds * 1000;
+        state.countdown.days * 24 * 60 * 60 * 1000 +
+        state.countdown.hours * 60 * 60 * 1000 +
+        state.countdown.minutes * 60 * 1000 +
+        state.countdown.seconds * 1000;
     dispatch({ type: 'STARTED', at: new Date(), countdownInMs });
     alerts.setAlert({ variant: 'success', title: 'Start pressed' });
-  }, [alerts, countdown]);
+  }, [alerts, state.countdown]);
   const onStop = useMemo(() => () => {
     dispatch({ type: 'STOPPED', at: new Date() });
     alerts.setAlert({ variant: 'success', title: 'Stop pressed' });
@@ -159,24 +174,36 @@ export default function App() {
               </Flex>
               <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
                 <TimeInput
-                  value={countdown}
-                  onChange={setCountdown}
+                  value={state.countdown}
+                  onChange={(countdown) => dispatch({ type: 'SET_COUNTDOWN', countdown })}
                 />
               </Flex>
 
-              {/*
+              {state.thresholds.length > 0 ? (
+                <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                  <Title headingLevel="h2" size="3xl">
+                    Threshold
+                  </Title>
+                </Flex>
+              ) : null}
+
+              {state.thresholds.map((threshold, index) => (
+                <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                  <TimeInput
+                    value={threshold}
+                    onChange={(threshold) => dispatch({ type: 'UPDATE_THRESHOLD', index, threshold })}
+                  />
+                  <Button variant="primary" onClick={() => dispatch({ type: 'REMOVE_THRESHOLD', index })}>
+                    Remove
+                  </Button>
+                </Flex>
+              ))}
+
               <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
-                <Title headingLevel="h2" size="3xl">
-                  Threshold
-                </Title>
+                <Button variant="secondary" onClick={() => dispatch({ type: 'ADD_THRESHOLD' })}>
+                  Add threshold
+                </Button>
               </Flex>
-              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
-                <TimeInput
-                  value={threshold}
-                  onChange={setThreshold}
-                />
-              </Flex>
-              */}
 
               <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
                 <Button variant="primary" onClick={onStart}>
