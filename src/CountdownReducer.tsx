@@ -1,9 +1,10 @@
+import { Lap } from "./types";
 
 export interface CounterState {
   startedAt: Date | null;
   pausedAt: Date | null;
   restTimeInMs: number,
-  laps: Array<{ at: Date, timeInMs: number }>;
+  laps: Array<Lap>;
 }
 
 export type CounterAction =

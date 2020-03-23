@@ -1,14 +1,15 @@
 import React, { useReducer, useEffect, useMemo } from 'react';
 
-import { Title, Button, Alert, AlertGroup, Expandable, Flex, FlexModifiers, Modal, FlexItem } from '@patternfly/react-core';
-import { Table, TableHeader, TableBody } from '@patternfly/react-table';
+import { Title, Button, Alert, AlertGroup, Expandable, Flex, FlexModifiers, Modal } from '@patternfly/react-core';
+
+import Countdown from './components/Countdown';
+import TimeInput from './components/TimeInput';
+import LapTable from './components/LapTable';
 
 import useAlerts from './hooks/useAlerts';
 import useModal from './hooks/useModal';
 
 import { reducer, initialState } from './CountdownReducer';
-import Countdown from './Countdown';
-import TimeInput from './TimeInput';
 
 export default function App() {
 
@@ -92,20 +93,6 @@ export default function App() {
       document.removeEventListener('keydown', onKeyDown);
     };
   });
-
-  const cells = [
-    { title: 'Lap #' },
-    { title: 'Lap delta' },
-    { title: 'Lap date' },
-    { title: 'Lap time' },
-  ];
-
-  const rows = state.laps.map((lap, index) => ([
-    index + 1,
-    lap.timeInMs,
-    lap.at.toLocaleDateString(),
-    lap.at.toLocaleTimeString(),
-  ]));
 
   const countdownUntil = state.restTimeInMs;
 
@@ -198,10 +185,7 @@ export default function App() {
               </Flex>
 
               <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
-                <Table aria-label="Laps" cells={cells} rows={rows}>
-                  <TableHeader />
-                  <TableBody />
-                </Table>
+                <LapTable laps={state.laps} />
               </Flex>
             </>
         }

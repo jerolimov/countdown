@@ -2,12 +2,7 @@ import React, { useState, useEffect, FocusEvent } from 'react';
 
 import { Split, Stack, TextInput } from '@patternfly/react-core';
 
-export interface Time {
-  days: number,
-  hours: number,
-  minutes: number,
-  seconds: number,
-}
+import { Time } from '../types';
 
 export interface TimeInputProps {
   value?: Time,
