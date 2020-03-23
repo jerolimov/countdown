@@ -49,12 +49,78 @@ describe('App', () => {
     fireEvent.change(hourInput, { target: {value: '2'} });
   });
 
-  it('restores state correctly', () => {
+  it('restores null-state correctly', () => {
     render(<App />)
 
     expect(getItem).toHaveBeenCalledWith('countdown_state');
 
     fireEvent.click(screen.getByText('Start'), {});
+
+    expect(setItem).toHaveBeenCalledWith('countdown_state', expect.any(String));
+
+  });
+
+  it('restores real state, started without laps', () => {
+    getItem.mockReturnValueOnce(JSON.stringify({
+      startedAt: new Date('2020-03-22 14:00:30'),
+      pausedAt: null,
+      restTimeInMs: 30000,
+      laps: [],
+    }))
+
+    render(<App />)
+
+    screen.getByText('Pause');
+    expect(screen.queryByText('Resume')).toBeFalsy();
+    screen.getByText('New lap');
+    expect(screen.getByText('Undo new lap').getAttribute('disabled')).toBe("");
+    screen.getByText('Stop');
+
+    expect(setItem).toHaveBeenCalledWith('countdown_state', expect.any(String));
+
+  });
+
+  it('restores real state, paused with laps', () => {
+    getItem.mockReturnValueOnce(JSON.stringify({
+      startedAt: new Date('2020-03-22 14:00:30'),
+      pausedAt: new Date('2020-03-22 14:00:50'),
+      restTimeInMs: 30000,
+      laps: [
+        { at: new Date('2020-03-22 14:00:55'), timeInMs: 10000 },
+        { at: new Date('2020-03-22 14:00:45'), timeInMs: 15000 },
+      ],
+    }))
+
+    render(<App />)
+
+    expect(screen.queryByText('Pause')).toBeFalsy();
+    screen.getByText('Resume');
+    screen.getByText('New lap');
+    expect(screen.getByText('Undo new lap').getAttribute('disabled')).toBe(null);
+    screen.getByText('Stop');
+
+    expect(setItem).toHaveBeenCalledWith('countdown_state', expect.any(String));
+
+  });
+
+  it('restores real state, stop countdown', () => {
+    getItem.mockReturnValueOnce(JSON.stringify({
+      startedAt: new Date('2020-03-22 14:00:30'),
+      pausedAt: null,
+      restTimeInMs: 30000,
+      laps: [
+        { at: new Date('2020-03-22 14:00:55'), timeInMs: 10000 },
+        { at: new Date('2020-03-22 14:00:45'), timeInMs: 15000 },
+      ],
+    }))
+
+    render(<App />)
+
+    fireEvent.click(screen.getByText('Stop'), {});
+    fireEvent.click(screen.getByText('Confirm'), {});
+
+    expect(screen.queryByText('Stop')).toBeFalsy();
+    screen.getByText('Start');
 
     expect(setItem).toHaveBeenCalledWith('countdown_state', expect.any(String));
 
