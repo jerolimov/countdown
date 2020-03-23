@@ -5,6 +5,24 @@ import App from './App';
 
 describe('App', () => {
 
+  let keyValues: Record<string, string>;
+  let getItem: jest.Mock;
+  let setItem: jest.Mock;
+
+  beforeEach(() => {
+    keyValues = {};
+    localStorage.__proto__.getItem = getItem = jest.fn();
+    localStorage.__proto__.setItem = setItem = jest.fn();
+    getItem.mockImplementation((name: string) => {
+      // console.log('getItem', name);
+      return keyValues[name];
+    });
+    setItem.mockImplementation((name: string, value: string) => {
+      // console.log('setItem', name, value);
+      keyValues[name] = value;
+    });
+  });
+  
   //
   // Helper
   //
@@ -29,6 +47,16 @@ describe('App', () => {
 
     fireEvent.change(dayInput, { target: {value: '1'} });
     fireEvent.change(hourInput, { target: {value: '2'} });
+  });
+
+  it('restores state correctly', () => {
+    render(<App />)
+
+    expect(getItem).toHaveBeenCalledWith('countdown_state');
+
+    fireEvent.click(screen.getByText('Start'), {});
+
+    expect(setItem).toHaveBeenCalledWith('countdown_state', expect.any(String));
 
   });
 });
