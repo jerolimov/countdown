@@ -60,11 +60,9 @@ export default function App() {
 
   const onKeyPress = useMemo(() => (e: KeyboardEvent) => {
     if (e.code === 'Space' && !e.shiftKey) {
-      if (e.shiftKey) {
-        onUndoNewLap();
-      } else {
-        onNewLap();
-      }
+      onNewLap();
+    } else if (e.code === 'Space' && e.shiftKey) {
+      onUndoNewLap();
     }
   }, []);
 
