@@ -1,4 +1,4 @@
-# Cowndown timer coding challenge
+# Countdown coding challenge
 
 ## Bootstrapped
 
