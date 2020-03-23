@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, getByText } from '@testing-library/react';
 
 import LapTable from './LapTable';
 import { Lap } from '../types';
@@ -27,15 +27,17 @@ describe('LapTable', () => {
     screen.getByText('Lap time');
 
     // Assert column content
-    screen.getByText('1');
-    screen.getByText('10000');
-    screen.getAllByText('3/22/2020');
-    screen.getByText('2:00:55 PM');
+    const rowWithLap1 = screen.getByText('1').parentElement!;
+    getByText(rowWithLap1, '1')
+    getByText(rowWithLap1, '15000')
+    getByText(rowWithLap1, '3/22/2020')
+    getByText(rowWithLap1, '2:00:45 PM')
 
-    screen.getByText('2');
-    screen.getByText('15000');
-    screen.getAllByText('3/22/2020');
-    screen.getByText('2:00:45 PM');
+    const rowWithLap2 = screen.getByText('2').parentElement!;
+    getByText(rowWithLap2, '2')
+    getByText(rowWithLap2, '10000')
+    getByText(rowWithLap2, '3/22/2020')
+    getByText(rowWithLap2, '2:00:55 PM')
   });
 
 });

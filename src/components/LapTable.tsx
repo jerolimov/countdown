@@ -19,7 +19,7 @@ export default function LapTable({ laps }: LapTableProps) {
 
   const rows = useMemo(() => laps.map((lap, index) => ({
     cells: [
-      index + 1,
+      laps.length - index,
       lap.timeInMs,
       lap.at.toLocaleDateString(),
       lap.at.toLocaleTimeString(),
