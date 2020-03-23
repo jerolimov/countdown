@@ -34,8 +34,8 @@ export default function Countdown({ until }: CountdownProps) {
 
   return (
     <div>
-      {'Countdown: '}
-      {countdownString}
+      <span>{'Countdown: '}</span>
+      <span>{countdownString}</span>
       <br/>
       {'Frames: '}
       {frames}

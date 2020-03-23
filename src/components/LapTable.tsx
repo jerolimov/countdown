@@ -17,12 +17,14 @@ const cells = [
 
 export default function LapTable({ laps }: LapTableProps) {
 
-  const rows = useMemo(() => laps.map((lap, index) => ([
-    index + 1,
-    lap.timeInMs,
-    lap.at.toLocaleDateString(),
-    lap.at.toLocaleTimeString(),
-  ])), [laps]);
+  const rows = useMemo(() => laps.map((lap, index) => ({
+    cells: [
+      index + 1,
+      lap.timeInMs,
+      lap.at.toLocaleDateString(),
+      lap.at.toLocaleTimeString(),
+    ],
+  })), [laps]);
 
   return (
     <Table aria-label="Laps" cells={cells} rows={rows}>
