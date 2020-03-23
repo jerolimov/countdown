@@ -67,27 +67,27 @@ export default function App() {
         state.countdown.minutes * 60 * 1000 +
         state.countdown.seconds * 1000;
     dispatch({ type: 'STARTED', at: new Date(), countdownInMs });
-    alerts.setAlert({ variant: 'success', title: 'Start pressed' });
+    alerts.setAlert({ variant: 'success', title: 'Countdown started!' });
   }, [alerts, state.countdown]);
   const onStop = useMemo(() => () => {
     dispatch({ type: 'STOPPED', at: new Date() });
-    alerts.setAlert({ variant: 'success', title: 'Stop pressed' });
+    alerts.setAlert({ variant: 'warning', title: 'Countdown stopped!' });
   }, [alerts]);
   const onPause = useMemo(() => () => {
     dispatch({ type: 'PAUSED', at: new Date() });
-    alerts.setAlert({ variant: 'success', title: 'Pause pressed' });
+    alerts.setAlert({ variant: 'warning', title: 'Countdown paused!' });
   }, [alerts]);
   const onResume = useMemo(() => () => {
     dispatch({ type: 'RESUMED', at: new Date() });
-    alerts.setAlert({ variant: 'success', title: 'Resume pressed' });
+    alerts.setAlert({ variant: 'success', title: 'Countdown resumed!' });
   }, [alerts]);
   const onNewLap = useMemo(() => () => {
     dispatch({ type: 'NEW_LAP', at: new Date() });
-    alerts.setAlert({ variant: 'success', title: 'New lap!' });  
+    alerts.setAlert({ variant: 'success', title: 'Created a new lap!' });  
   }, [alerts]);
   const onUndoNewLap = useMemo(() => () => {
     dispatch({ type: 'UNDO_NEW_LAP' });
-    alerts.setAlert({ variant: 'success', title: 'Undo new lap!' });
+    alerts.setAlert({ variant: 'warning', title: 'Undo new lap!' });
   }, [alerts]);
 
   // Keyboard hooks
