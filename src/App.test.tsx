@@ -37,10 +37,10 @@ describe('App', () => {
   it('renders', () => {
     render(<App />)
 
-    expect(screen.getAllByLabelText(/day/i)).toHaveLength(2);
-    expect(screen.getAllByLabelText(/hour/i)).toHaveLength(2);
-    expect(screen.getAllByLabelText(/minute/i)).toHaveLength(2);
-    expect(screen.getAllByLabelText(/second/i)).toHaveLength(2);
+    expect(screen.getAllByLabelText(/day/i)).toHaveLength(1);
+    expect(screen.getAllByLabelText(/hour/i)).toHaveLength(1);
+    expect(screen.getAllByLabelText(/minute/i)).toHaveLength(1);
+    expect(screen.getAllByLabelText(/second/i)).toHaveLength(1);
 
     const dayInput = getFirstInputElementByLabelText(/day/i);
     const hourInput = getFirstInputElementByLabelText(/hour/i);

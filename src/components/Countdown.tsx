@@ -15,7 +15,7 @@ export default function Countdown({ paused, until }: CountdownProps) {
   useEffect(() => {
     const timer = !paused ? setInterval(() => {
       updateFrames(frame => frame + 1);
-    }, 100) : null;
+    }, 16) : null;
     return () => {
       if (timer) {
         clearInterval(timer);
@@ -30,15 +30,9 @@ export default function Countdown({ paused, until }: CountdownProps) {
   const fps = Math.round(frames / (Date.now() - start) * 1000);
 
   return (
-    <div>
-      <span>{'Countdown: '}</span>
-      <span>{countdownString}</span>
-      <br/>
-      {'Frames: '}
-      {frames}
-      <br/>
-      {'FPS: '}
-      {fps}
+    <div style={{ textAlign: 'center' }}>
+      Countdown:<br/>
+      <pre style={{ fontSize: 24 }}>{countdownString}</pre>
     </div>
   );
 }

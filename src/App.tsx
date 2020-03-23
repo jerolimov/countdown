@@ -166,6 +166,7 @@ export default function App() {
                 />
               </Flex>
 
+              {/*
               <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
                 <Title headingLevel="h2" size="3xl">
                   Threshold
@@ -177,6 +178,7 @@ export default function App() {
                   onChange={setThreshold}
                 />
               </Flex>
+              */}
 
               <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
                 <Button variant="primary" onClick={onStart}>

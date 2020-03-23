@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 
 import { Lap } from '../types';
+import { getCountdownAsString } from '../utils/date';
 
 interface LapTableProps {
   laps: Lap[],
@@ -20,7 +21,7 @@ export default function LapTable({ laps }: LapTableProps) {
   const rows = useMemo(() => laps.map((lap, index) => ({
     cells: [
       laps.length - index,
-      lap.timeInMs,
+      getCountdownAsString(lap.timeInMs),
       lap.at.toLocaleDateString(),
       lap.at.toLocaleTimeString(),
     ],
