@@ -9,7 +9,7 @@ import LapTable from './components/LapTable';
 import useAlerts from './hooks/useAlerts';
 import useModal from './hooks/useModal';
 
-import { reducer, initialState } from './CountdownReducer';
+import { reducer, initialState } from './reducers/CountdownReducer';
 
 export default function App() {
 

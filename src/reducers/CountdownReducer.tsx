@@ -1,4 +1,4 @@
-import { Lap } from "./types";
+import { Lap } from "../types";
 
 export interface CounterState {
   startedAt: Date | null;
