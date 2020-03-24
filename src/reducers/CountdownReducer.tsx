@@ -41,12 +41,13 @@ export const reducer = (prevState: CounterState, action: CounterAction): Counter
     }
 
     case 'STARTED': {
-      // Save new started at and until date. Reset laps?!
+      // Save new started at and until date.
       return {
         ...prevState,
         startedAt: action.at,
         pausedAt: null,
         restTimeInMs: action.countdownInMs,
+        laps: [],
       };
     }
 
