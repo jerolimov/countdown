@@ -52,11 +52,11 @@ describe('App', () => {
   it('restores null-state correctly', () => {
     render(<App />)
 
-    expect(getItem).toHaveBeenCalledWith('countdown_state');
+    expect(getItem).toHaveBeenCalledWith('countdown_state_v2');
 
     fireEvent.click(screen.getByText('Start'), {});
 
-    expect(setItem).toHaveBeenCalledWith('countdown_state', expect.any(String));
+    expect(setItem).toHaveBeenCalledWith('countdown_state_v2', expect.any(String));
 
   });
 
@@ -65,7 +65,9 @@ describe('App', () => {
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
-      laps: [],
+      laps: [
+        { startedAt: new Date('2020-03-22 15:00:00'), timeInMs: null, pausedInMs: 0 },
+      ],
     }))
 
     render(<App />)
@@ -76,7 +78,7 @@ describe('App', () => {
     expect(screen.getByText('Undo new lap').getAttribute('disabled')).toBe("");
     screen.getByText('Stop');
 
-    expect(setItem).toHaveBeenCalledWith('countdown_state', expect.any(String));
+    expect(setItem).toHaveBeenCalledWith('countdown_state_v2', expect.any(String));
 
   });
 
@@ -99,7 +101,7 @@ describe('App', () => {
     expect(screen.getByText('Undo new lap').getAttribute('disabled')).toBe(null);
     screen.getByText('Stop');
 
-    expect(setItem).toHaveBeenCalledWith('countdown_state', expect.any(String));
+    expect(setItem).toHaveBeenCalledWith('countdown_state_v2', expect.any(String));
 
   });
 
@@ -122,7 +124,7 @@ describe('App', () => {
     expect(screen.queryByText('Stop')).toBeFalsy();
     screen.getByText('Start');
 
-    expect(setItem).toHaveBeenCalledWith('countdown_state', expect.any(String));
+    expect(setItem).toHaveBeenCalledWith('countdown_state_v2', expect.any(String));
 
   });
 });

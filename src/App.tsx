@@ -23,10 +23,10 @@ export default function App() {
 
   // Countdown state
   const [state, dispatch] = useReducer(reducer, null, () => {
-    return parseCounterState(localStorage.getItem('countdown_state') || "{}")
+    return parseCounterState(localStorage.getItem('countdown_state_v2') || "{}")
   });
   useEffect(() => {
-    localStorage.setItem(('countdown_state'), stringifyCounterState(state));
+    localStorage.setItem(('countdown_state_v2'), stringifyCounterState(state));
   }, [state]);
 
   const currentLap = state.laps[state.laps.length - 1];
@@ -34,7 +34,7 @@ export default function App() {
   // Notifiy about thresholds
   const [thresholdTimer] = useState<Array<any>>([]);
   useEffect(() => {
-    console.log('mount');
+    // console.log('mount');
     if (state.startedAt && !state.pausedAt) {
       state.thresholds.forEach((threshold) => {
         const thresholdInMs =
@@ -56,7 +56,7 @@ export default function App() {
       });
     }
     return () => {
-      console.log('unmount');
+      // console.log('unmount');
       thresholdTimer.forEach(timer => clearTimeout(timer));
       thresholdTimer.splice(0); // Remove all entries without rerendering!
     }

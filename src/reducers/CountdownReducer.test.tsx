@@ -15,7 +15,9 @@ describe('reducer', () => {
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
-      laps: [],
+      laps: [
+        { startedAt: new Date('2020-03-22 14:00:30'), timeInMs: null, pausedInMs: 0 },
+      ],
     }
     expect(reducer(initialState, action)).toEqual(expectedState);
   });
@@ -27,7 +29,9 @@ describe('reducer', () => {
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
-      laps: [],
+      laps: [
+        { startedAt: new Date('2020-03-22 14:00:30'), timeInMs: null, pausedInMs: 0 },
+      ],
     }
     const action: CounterAction = {
       type: 'STOPPED',
@@ -39,7 +43,9 @@ describe('reducer', () => {
       startedAt: null,
       pausedAt: null,
       restTimeInMs: 30000,
-      laps: [],
+      laps: [
+        { startedAt: new Date('2020-03-22 14:00:30'), timeInMs: null, pausedInMs: 0 },
+      ],
     }
     expect(reducer(prevState, action)).toEqual(expectedState);
   });
@@ -51,7 +57,9 @@ describe('reducer', () => {
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
-      laps: [],
+      laps: [
+        { startedAt: new Date('2020-03-22 14:00:30'), timeInMs: null, pausedInMs: 0 },
+      ],
     }
     const action: CounterAction = {
       type: 'PAUSED',
@@ -63,7 +71,9 @@ describe('reducer', () => {
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: new Date('2020-03-22 14:30:45'),
       restTimeInMs: 30000,
-      laps: [],
+      laps: [
+        { startedAt: new Date('2020-03-22 14:00:30'), timeInMs: null, pausedInMs: 0 },
+      ],
     }
     expect(reducer(prevState, action)).toEqual(expectedState);
   });
@@ -73,21 +83,25 @@ describe('reducer', () => {
       countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
       thresholds: [],
       startedAt: new Date('2020-03-22 14:00:30'),
-      pausedAt: new Date('2020-03-22 14:30:45'),
-      restTimeInMs: 30000,
-      laps: [],
+      pausedAt: new Date('2020-03-22 14:00:32'),
+      restTimeInMs: 30 * 1000,
+      laps: [
+        { startedAt: new Date('2020-03-22 14:00:30'), timeInMs: null, pausedInMs: 0 },
+      ],
     }
     const action: CounterAction = {
       type: 'RESUMED',
-      at: new Date('2020-03-22 14:30:50'),
+      at: new Date('2020-03-22 14:00:35'),
     }
     const expectedState: CounterState = {
       countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
       thresholds: [],
-      startedAt: new Date('2020-03-22 14:00:30'),
+      startedAt: new Date('2020-03-22 14:00:35'),
       pausedAt: null,
-      restTimeInMs: 25000,
-      laps: [],
+      restTimeInMs: 28 * 1000,
+      laps: [
+        { startedAt: new Date('2020-03-22 14:00:30'), timeInMs: null, pausedInMs: 3000 },
+      ],
     }
     expect(reducer(prevState, action)).toEqual(expectedState);
   });
@@ -99,11 +113,13 @@ describe('reducer', () => {
       startedAt: new Date('2020-03-22 14:00:30'),
       pausedAt: null,
       restTimeInMs: 30000,
-      laps: [],
+      laps: [
+        { startedAt: new Date('2020-03-22 14:00:30'), timeInMs: null, pausedInMs: 0 },
+      ],
     }
     const action: CounterAction = {
       type: 'NEW_LAP',
-      at: new Date('2020-03-22 14:00:45'),
+      at: new Date('2020-03-22 14:00:35'),
     }
     const expectedState: CounterState = {
       countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
@@ -112,7 +128,8 @@ describe('reducer', () => {
       pausedAt: null,
       restTimeInMs: 30000,
       laps: [
-        { at: new Date('2020-03-22 14:00:45'), timeInMs: 15000 },
+        { startedAt: new Date('2020-03-22 14:00:30'), timeInMs: 5000, pausedInMs: 0 },
+        { startedAt: new Date('2020-03-22 14:00:35'), timeInMs: null, pausedInMs: 0 },
       ],
     }
     expect(reducer(prevState, action)).toEqual(expectedState);
@@ -126,12 +143,13 @@ describe('reducer', () => {
       pausedAt: null,
       restTimeInMs: 30000,
       laps: [
-        { at: new Date('2020-03-22 14:00:45'), timeInMs: 15000 },
+        { startedAt: new Date('2020-03-22 14:00:30'), timeInMs: 2000, pausedInMs: 0 },
+        { startedAt: new Date('2020-03-22 14:00:32'), timeInMs: null, pausedInMs: 0 },
       ],
     }
     const action: CounterAction = {
       type: 'NEW_LAP',
-      at: new Date('2020-03-22 14:00:55'),
+      at: new Date('2020-03-22 14:00:35'),
     }
     const expectedState: CounterState = {
       countdown: { days: 0, hours: 0, minutes: 0, seconds: 0 },
@@ -140,8 +158,9 @@ describe('reducer', () => {
       pausedAt: null,
       restTimeInMs: 30000,
       laps: [
-        { at: new Date('2020-03-22 14:00:55'), timeInMs: 10000 },
-        { at: new Date('2020-03-22 14:00:45'), timeInMs: 15000 },
+        { startedAt: new Date('2020-03-22 14:00:30'), timeInMs: 2000, pausedInMs: 0 },
+        { startedAt: new Date('2020-03-22 14:00:32'), timeInMs: 3000, pausedInMs: 0 },
+        { startedAt: new Date('2020-03-22 14:00:35'), timeInMs: null, pausedInMs: 0 },
       ],
     }
     expect(reducer(prevState, action)).toEqual(expectedState);
@@ -155,7 +174,7 @@ describe('reducer', () => {
       pausedAt: null,
       restTimeInMs: 30000,
       laps: [
-        { at: new Date('2020-03-22 14:30:45'), timeInMs: 30000 },
+        { startedAt: new Date('2020-03-22 14:30:45'), timeInMs: 30000, pausedInMs: 0 },
       ],
     }
     const action: CounterAction = {
@@ -180,8 +199,8 @@ describe('reducer', () => {
       pausedAt: null,
       restTimeInMs: 30000,
       laps: [
-        { at: new Date('2020-03-22 14:31:45'), timeInMs: 30000 },
-        { at: new Date('2020-03-22 14:30:45'), timeInMs: 30000 },
+        { startedAt: new Date('2020-03-22 14:31:45'), timeInMs: 30000, pausedInMs: 0 },
+        { startedAt: new Date('2020-03-22 14:30:45'), timeInMs: 30000, pausedInMs: 0 },
       ],
     }
     const action: CounterAction = {
@@ -194,7 +213,7 @@ describe('reducer', () => {
       pausedAt: null,
       restTimeInMs: 30000,
       laps: [
-        { at: new Date('2020-03-22 14:30:45'), timeInMs: 30000 },
+        { startedAt: new Date('2020-03-22 14:30:45'), timeInMs: 30000, pausedInMs: 0 },
       ],
     }
     expect(reducer(prevState, action)).toEqual(expectedState);
