@@ -1,30 +1,31 @@
 import React, { useEffect, useState } from 'react';
 
-import { getTimeWithMilliseconds, getTimeWithoutMilliseconds, getTimeMilliseconds } from '../utils/date';
+import { getTimeWithoutMilliseconds, getTimeMilliseconds } from '../utils/date';
 
 export interface CountdownProps {
   startedAt: Date,
-  paused: boolean,
+  pausedAt: Date | null,
   restTimeInMs: number,
 }
 
-export default function Countdown({ startedAt, paused, restTimeInMs }: CountdownProps) {
+export default function Countdown({ startedAt, pausedAt, restTimeInMs }: CountdownProps) {
   return (
     <pre style={{ textAlign: 'center', fontSize: 24 }}>
-      <CountdownTimeWithoutMilliseconds startedAt={startedAt} paused={paused} restTimeInMs={restTimeInMs} />
+      <CountdownTimeWithoutMilliseconds startedAt={startedAt} pausedAt={pausedAt} restTimeInMs={restTimeInMs} />
       {'.'}
-      <CountdownTimeJustMilliseconds startedAt={startedAt} paused={paused} restTimeInMs={restTimeInMs} />
+      <CountdownTimeJustMilliseconds startedAt={startedAt} pausedAt={pausedAt} restTimeInMs={restTimeInMs} />
     </pre>
   );
 }
 
-function CountdownTimeWithoutMilliseconds({ startedAt, paused, restTimeInMs }: CountdownProps) {
-  const untilInMs = startedAt.getTime() - Date.now() + restTimeInMs;
+function CountdownTimeWithoutMilliseconds({ startedAt, pausedAt, restTimeInMs }: CountdownProps) {
+  const nowInMs = pausedAt?.getTime() ?? Date.now();
+  const untilInMs = startedAt.getTime() - nowInMs + restTimeInMs;
   const [, updateFrames] = useState<number>(0);
 
   // Endless re-rending loop (if not paused)
   useEffect(() => {
-    const timer = !paused ? setInterval(() => {
+    const timer = !pausedAt ? setInterval(() => {
       updateFrames(frame => frame + 1);
     }, 200) : null;
     return () => {
@@ -32,18 +33,19 @@ function CountdownTimeWithoutMilliseconds({ startedAt, paused, restTimeInMs }: C
         clearInterval(timer);
       }
     };
-  }, [paused]);
+  }, [pausedAt]);
 
   return <>{getTimeWithoutMilliseconds(untilInMs)}</>
 }
 
-function CountdownTimeJustMilliseconds({ startedAt, paused, restTimeInMs }: CountdownProps) {
-  const untilInMs = startedAt.getTime() - Date.now() + restTimeInMs;
+function CountdownTimeJustMilliseconds({ startedAt, pausedAt, restTimeInMs }: CountdownProps) {
+  const nowInMs = pausedAt?.getTime() ?? Date.now();
+  const untilInMs = startedAt.getTime() - nowInMs + restTimeInMs;
   const [, updateFrames] = useState<number>(0);
 
   // Endless re-rending loop (if not paused)
   useEffect(() => {
-    const timer = !paused ? setInterval(() => {
+    const timer = !pausedAt ? setInterval(() => {
       updateFrames(frame => frame + 1);
     }, 16) : null;
     return () => {
@@ -51,7 +53,7 @@ function CountdownTimeJustMilliseconds({ startedAt, paused, restTimeInMs }: Coun
         clearInterval(timer);
       }
     };
-  }, [paused]);
+  }, [pausedAt]);
 
   return <>{getTimeMilliseconds(untilInMs)}</>
 }

@@ -7,8 +7,9 @@ export interface Time {
 }
 
 export interface Lap {
-  at: Date,
-  timeInMs: number,
+  startedAt: Date,
+  timeInMs: number | null,
+  pausedInMs: number,
 }
 
 export interface CounterState {

@@ -18,12 +18,12 @@ const cells = [
 
 export default function LapTable({ laps }: LapTableProps) {
 
-  const rows = useMemo(() => laps.map((lap, index) => ({
+  const rows = useMemo(() => laps.slice(0, laps.length - 1).reverse().map((lap, index) => ({
     cells: [
-      laps.length - index,
-      getTimeWithMilliseconds(lap.timeInMs),
-      lap.at.toLocaleDateString(),
-      lap.at.toLocaleTimeString(),
+      laps.length - index - 1,
+      getTimeWithMilliseconds(lap.timeInMs! - lap.pausedInMs),
+      lap.startedAt.toLocaleDateString(),
+      lap.startedAt.toLocaleTimeString(),
     ],
   })), [laps]);
 

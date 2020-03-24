@@ -10,7 +10,10 @@ export function parseCounterState(state: string): CounterState {
       startedAt: restoredState?.startedAt ? new Date(restoredState?.startedAt) : null,
       pausedAt: restoredState?.pausedAt ? new Date(restoredState?.pausedAt) : null,
       restTimeInMs: restoredState?.restTimeInMs ?? null,
-      laps: restoredState?.laps?.map((lap: any) => ({ at: new Date(lap.at), timeInMs: lap.timeInMs })) ?? [],
+      laps: restoredState?.laps?.map((lap: any) => ({
+        ...lap,
+        startedAt: new Date(lap.startedAt),
+      })) ?? [],
     };
   } catch (error) {
     console.warn('error', error);

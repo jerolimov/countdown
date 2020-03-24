@@ -47,17 +47,12 @@ export const reducer = (prevState: CounterState, action: CounterAction): Counter
         startedAt: action.at,
         pausedAt: null,
         restTimeInMs: action.countdownInMs,
-        laps: [],
+        laps: [{
+          startedAt: action.at,
+          timeInMs: null,
+          pausedInMs: 0,
+        }],
       };
-    }
-
-    case 'STOPPED': {
-      // Stopp only if countdown is running.. Re-tap stop to remove also the laps!
-      if (prevState.startedAt) {
-        return { ...prevState, startedAt: null, pausedAt: null };
-      } else {
-        return initialState;
-      }
     }
 
     case 'PAUSED': {
@@ -72,32 +67,83 @@ export const reducer = (prevState: CounterState, action: CounterAction): Counter
     case 'RESUMED': {
       // Resume only if countdown is paused...
       if (prevState.startedAt && prevState.pausedAt) {
-        const resumedAfterInMs = action.at.getTime() - prevState.pausedAt.getTime();
-        const restTimeInMs = prevState.restTimeInMs - resumedAfterInMs
-        return { ...prevState, pausedAt: null, restTimeInMs };
+        const runnedPrevInMs = prevState.pausedAt.getTime() - prevState.startedAt.getTime();
+        const pausedInMs = action.at.getTime() - prevState.pausedAt.getTime();
+        let lastLap = prevState.laps[prevState.laps.length - 1];
+        lastLap = {
+          ...lastLap,
+          pausedInMs: lastLap.pausedInMs + pausedInMs,
+        }
+        const laps = [...prevState.laps.slice(0, prevState.laps.length - 1), lastLap];
+        return {
+          ...prevState,
+          startedAt: action.at,
+          restTimeInMs: prevState.restTimeInMs - runnedPrevInMs,
+          pausedAt: null,
+          laps,
+        };
       } else {
         return prevState;
       }
     }
 
+    case 'STOPPED': {
+      // Stopp only if countdown is running.. Re-tap stop to remove also the laps!
+      if (prevState.startedAt) {
+        return { ...prevState, startedAt: null, pausedAt: null };
+      } else {
+        return initialState;
+      }
+    }
+
     case 'NEW_LAP': {
       // Create a new lap (and prepend it)
-      if (prevState.startedAt) {
-        const from = prevState.laps[0]?.at || prevState.pausedAt || prevState.startedAt;
-        const until = action.at;
-        const timeInMs = until.getTime() - from.getTime();
-        return { ...prevState, laps: [ { at: action.at, timeInMs }, ...prevState.laps ] };
+      if (prevState.startedAt && !prevState.pausedAt) {
+        let prevLap = prevState.laps[prevState.laps.length - 1];
+        prevLap = {
+          ...prevLap,
+          timeInMs: action.at.getTime() - prevLap.startedAt.getTime(),
+        };
+        const newLap = {
+          startedAt: action.at,
+          timeInMs: null,
+          pausedInMs: 0,
+        };
+        const laps = [...prevState.laps.slice(0, prevState.laps.length - 1), prevLap, newLap];
+        return {
+          ...prevState,
+          laps,
+        };
       } else {
         return prevState;
       }
     }
 
     case 'UNDO_NEW_LAP': {
-      // Remove newest lap (first in list)
-      return {
-        ...prevState,
-        laps: prevState.laps.slice(1),
-      };
+      if (prevState.laps.length < 3) {
+        return {
+          ...prevState,
+          laps: prevState.laps.slice(1)
+        };
+      } else {
+        let currentLap = prevState.laps[prevState.laps.length - 1];
+        let prev1 = prevState.laps[prevState.laps.length - 2];
+        let prev2 = prevState.laps[prevState.laps.length - 3];
+        const newLap = {
+          startedAt: prev2.startedAt,
+          timeInMs: prev1.timeInMs! + prev2.timeInMs!,
+          pausedInMs: prev1.pausedInMs + prev2.pausedInMs,
+        };
+        const laps = [
+          ...prevState.laps.slice(0, prevState.laps.length - 3),
+          newLap,
+          currentLap,
+        ];
+        return {
+          ...prevState,
+          laps,
+        };
+      }
     }
 
     default: {

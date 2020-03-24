@@ -29,25 +29,28 @@ export default function App() {
     localStorage.setItem(('countdown_state'), stringifyCounterState(state));
   }, [state]);
 
+  const currentLap = state.laps[state.laps.length - 1];
+
   // Notifiy about thresholds
   const [thresholdTimer] = useState<Array<any>>([]);
   useEffect(() => {
     console.log('mount');
     if (state.startedAt && !state.pausedAt) {
       state.thresholds.forEach((threshold) => {
-        const countdownInMs =
-            state.restTimeInMs -
-            threshold.days * 24 * 60 * 60 * 1000 -
-            threshold.hours * 60 * 60 * 1000 -
-            threshold.minutes * 60 * 1000 -
+        const thresholdInMs =
+            threshold.days * 24 * 60 * 60 * 1000 +
+            threshold.hours * 60 * 60 * 1000 +
+            threshold.minutes * 60 * 1000 +
             threshold.seconds * 1000;
-        const countdownTimeString = getTimeWithoutMilliseconds(countdownInMs);
+        const thresholdString = getTimeWithoutMilliseconds(thresholdInMs);
+        const currentLapTime = Date.now() - currentLap.startedAt.getTime() - currentLap.pausedInMs;
+        const countdownInMs = thresholdInMs - currentLapTime;
         if (countdownInMs > 0) {
           thresholdTimer.push(setTimeout(() => {
             alerts.addAlert({
               variant: 'warning',
-              title: `Threshold ${countdownTimeString} reached!`,
-            }, 10000);
+              title: `Threshold ${thresholdString} reached!`,
+            }, 5000);
           }, countdownInMs));
         }
       });
@@ -57,7 +60,7 @@ export default function App() {
       thresholdTimer.forEach(timer => clearTimeout(timer));
       thresholdTimer.splice(0); // Remove all entries without rerendering!
     }
-  }, [state.startedAt, state.pausedAt, state.thresholds])
+  }, [state.startedAt, state.pausedAt, state.thresholds, currentLap])
 
   // Button callbacks
   const onStart = useMemo(() => () => {
@@ -117,7 +120,9 @@ export default function App() {
   return (
     <>
       <AlertGroup isToast>
-        {alerts.alerts.map(alert => <Alert {...alert} />)}
+        {alerts.alerts.map(alert => 
+          <Alert key={alert.key} {...alert} />
+        )}
       </AlertGroup>
 
       <Modal
@@ -188,7 +193,7 @@ export default function App() {
               ) : null}
 
               {state.thresholds.map((threshold, index) => (
-                <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <Flex key={index} breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
                   <TimeInput
                     value={threshold}
                     onChange={(threshold) => dispatch({ type: 'UPDATE_THRESHOLD', index, threshold })}
@@ -214,10 +219,27 @@ export default function App() {
           :
             <>
               <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <Title headingLevel="h2" size="3xl">
+                  Overall countdown
+                </Title>
+              </Flex>
+              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
                 <Countdown
                   startedAt={state.startedAt}
-                  paused={!!state.pausedAt}
+                  pausedAt={state.pausedAt}
                   restTimeInMs={state.restTimeInMs}
+                />
+              </Flex>
+              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <Title headingLevel="h2" size="3xl">
+                  Current lap
+                </Title>
+              </Flex>
+              <Flex breakpointMods={[{ modifier: FlexModifiers["align-self-center"] }]}>
+                <Countdown
+                  startedAt={currentLap.startedAt}
+                  pausedAt={state.pausedAt}
+                  restTimeInMs={currentLap.pausedInMs}
                 />
               </Flex>
 
@@ -230,10 +252,10 @@ export default function App() {
                 <Button variant="primary" onClick={!state.pausedAt ? onPause : onResume}>
                   {!state.pausedAt ? 'Pause' : 'Resume'}
                 </Button>
-                <Button variant="secondary" aria-label="New lap" onClick={onNewLap}>
+                <Button variant="secondary" aria-label="New lap" isDisabled={!!state.pausedAt} onClick={onNewLap}>
                   <AddCircleOIcon /> New lap
                 </Button>
-                <Button variant="secondary" aria-label="Undo new lap" isDisabled={state.laps.length < 1} onClick={onUndoNewLap}>
+                <Button variant="secondary" aria-label="Undo new lap" isDisabled={state.laps.length < 2} onClick={onUndoNewLap}>
                   <HistoryIcon /> Undo new lap
                 </Button>
                 <Button variant="danger" onClick={deleteModal.open}>
